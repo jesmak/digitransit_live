@@ -1,0 +1,99 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Digitransit Live",
+        "description": "Live buses, trams and other public transport vehicles from Digitransit, as map feeds. Once this is set up, add feeds from the integration page.",
+        "data": {
+          "language": "Language"
+        },
+        "data_description": {
+          "language": "Language of the texts written into feeds, such as \"Line 4\" and popup rows."
+        }
+      },
+      "reconfigure": {
+        "title": "Digitransit Live",
+        "data": {
+          "language": "Language"
+        },
+        "data_description": {
+          "language": "Language of the texts written into feeds, such as \"Line 4\" and popup rows."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Digitransit Live is already set up. Add more feeds from the integration page.",
+      "reconfigure_successful": "Settings saved."
+    }
+  },
+  "config_subentries": {
+    "vehicles": {
+      "entry_type": "Vehicle feed",
+      "initiate_flow": {
+        "user": "Add vehicle feed",
+        "reconfigure": "Change vehicle feed"
+      },
+      "step": {
+        "user": {
+          "title": "Vehicle feed",
+          "description": "Public transport vehicles that report their position to Digitransit.",
+          "data": {
+            "name": "Name",
+            "feed": "Region",
+            "lines": "Lines",
+            "use_area": "Limit to an area",
+            "area": "Area",
+            "max_age_minutes": "Maximum position age",
+            "update_seconds": "Update interval"
+          },
+          "data_description": {
+            "name": "Also the name of the feed's sensor.",
+            "feed": "The region's feed on Digitransit. Pick one, or type another feed id.",
+            "lines": "Line numbers such as 4 or 8A. Leave empty for every line.",
+            "area": "Used only when \"Limit to an area\" is on.",
+            "max_age_minutes": "Vehicles that haven't reported for longer are left out.",
+            "update_seconds": "How often the sensor is updated. Vehicles report about once a second."
+          }
+        },
+        "reconfigure": {
+          "title": "Vehicle feed",
+          "description": "Public transport vehicles that report their position to Digitransit.",
+          "data": {
+            "name": "Name",
+            "feed": "Region",
+            "lines": "Lines",
+            "use_area": "Limit to an area",
+            "area": "Area",
+            "max_age_minutes": "Maximum position age",
+            "update_seconds": "Update interval"
+          },
+          "data_description": {
+            "name": "Also the name of the feed's sensor.",
+            "feed": "The region's feed on Digitransit. Pick one, or type another feed id.",
+            "lines": "Line numbers such as 4 or 8A. Leave empty for every line.",
+            "area": "Used only when \"Limit to an area\" is on.",
+            "max_age_minutes": "Vehicles that haven't reported for longer are left out.",
+            "update_seconds": "How often the sensor is updated. Vehicles report about once a second."
+          }
+        }
+      },
+      "error": {
+        "invalid_feed": "A feed id contains only letters, digits, - and _.",
+        "invalid_line": "A line number can't contain spaces, /, # or +.",
+        "area_radius": "Drag the circle's edge on the map to set a radius."
+      },
+      "abort": {
+        "reconfigure_successful": "Feed saved."
+      }
+    }
+  },
+  "selector": {
+    "language": {
+      "options": {
+        "fi": "Suomi",
+        "sv": "Svenska",
+        "en": "English"
+      }
+    }
+  }
+}

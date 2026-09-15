@@ -1,0 +1,14 @@
+{
+  "domain": "digitransit_live",
+  "name": "Digitransit Live",
+  "codeowners": ["@jesmak"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jesmak/digitransit_live",
+  "integration_type": "service",
+  "iot_class": "cloud_push",
+  "issue_tracker": "https://github.com/jesmak/digitransit_live/issues",
+  "requirements": ["paho-mqtt==2.1.0", "gtfs-realtime-bindings==2.2.0"],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}
