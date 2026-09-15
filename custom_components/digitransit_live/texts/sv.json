@@ -1,5 +1,6 @@
 {
   "line": "Linje {line}",
   "departure": "Avgångstid",
-  "vehicle": "Fordon"
+  "vehicle": "Fordon",
+  "move_pin": "Flytta nålen för att se andra hållplatser"
 }

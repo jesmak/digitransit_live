@@ -1,5 +1,6 @@
 {
   "line": "Linja {line}",
   "departure": "Lähtöaika",
-  "vehicle": "Ajoneuvo"
+  "vehicle": "Ajoneuvo",
+  "move_pin": "Siirrä merkkiä nähdäksesi muita pysäkkejä"
 }

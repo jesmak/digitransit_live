@@ -8,9 +8,10 @@ from homeassistant.config_entries import ConfigEntryState, ConfigSubentryData
 from homeassistant.const import MATCH_ALL, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
-from custom_components.digitransit_live.const import DOMAIN
-from custom_components.digitransit_live.sensor import MapFeedSensor
+from custom_components.digitransit_live.const import DOMAIN, ROUTING_API
+from custom_components.digitransit_live.sensor import DeparturesSensor, MapFeedSensor
 
 from .conftest import LAPPEENRANTA_AREA, FakeMqtt, vehicle_message
 
@@ -125,3 +126,55 @@ async def test_old_vehicles_are_dropped_and_a_silent_disconnected_feed_is_unavai
     await hass.async_block_till_done()
     assert hass.states.get("sensor.linja_4").state == "1", "still hearing vehicles"
     assert hass.states.get("sensor.tampere").state == STATE_UNAVAILABLE, "disconnected and silent"
+
+
+def departures_entry(hass: HomeAssistant, **data: str) -> MockConfigEntry:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Digitransit",
+        data={"language": "fi"} | data,
+        subentries_data=[
+            ConfigSubentryData(
+                subentry_type="departures",
+                title="Kauppatori (H0453)",
+                unique_id=None,
+                data={"router": "hsl", "stop": "HSL:1020453", "departures": 2, "lines": [], "update_seconds": 60},
+            )
+        ],
+    )
+    entry.add_to_hass(hass)
+    return entry
+
+
+async def test_departures_sensor(
+    hass: HomeAssistant, routing_api: AiohttpClientMocker, fake_mqtt: type[FakeMqtt]
+) -> None:
+    entry = departures_entry(hass, api_key="test-key")
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert fake_mqtt.instances == [], "no vehicle feeds, no broker connection"
+    state = hass.states.get("sensor.kauppatori_h0453")
+    assert state.state == "2026-09-15T09:01:30+00:00", "the next departure's real-time estimate"
+    assert state.attributes["device_class"] == "timestamp"
+    assert state.attributes["stop_name"] == "Kauppatori"
+    assert state.attributes["stop_code"] == "H0453"
+    assert [departure["line"] for departure in state.attributes["departures"]] == ["4", "16"]
+    assert state.attributes["departures"][0]["delay"] == -30
+
+    assert await hass.config_entries.async_unload(entry.entry_id)
+
+
+async def test_departures_are_kept_out_of_the_recorder() -> None:
+    assert "departures" in DeparturesSensor._unrecorded_attributes
+
+
+async def test_a_refused_api_key_asks_for_a_new_one(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+    aioclient_mock.post(ROUTING_API.format(router="hsl"), status=401)
+    entry = departures_entry(hass, api_key="expired")
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.kauppatori_h0453").state == STATE_UNAVAILABLE
+    [flow] = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    assert flow["context"]["source"] == "reauth"

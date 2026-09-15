@@ -3,27 +3,43 @@
     "step": {
       "user": {
         "title": "Digitransit Live",
-        "description": "Digitransitin bussit, raitiovaunut ja muut joukkoliikenteen ajoneuvot reaaliajassa karttasyötteinä. Lisää syötteet integraation sivulta, kun tämä on valmis.",
+        "description": "Digitransitin bussit, raitiovaunut ja muut joukkoliikenteen ajoneuvot reaaliajassa karttasyötteinä sekä pysäkkien lähdöt. Lisää syötteet ja pysäkit integraation sivulta, kun tämä on valmis.",
         "data": {
-          "language": "Kieli"
+          "language": "Kieli",
+          "api_key": "Digitransitin API-avain"
         },
         "data_description": {
-          "language": "Kieli, jolla syötteisiin kirjoitetaan tekstit, kuten \"Linja 4\" ja ponnahdusikkunan rivit."
+          "language": "Kieli, jolla syötteisiin kirjoitetaan tekstit, kuten \"Linja 4\" ja ponnahdusikkunan rivit.",
+          "api_key": "Tarvitaan vain pysäkkien lähtöihin. Maksuttoman avaimen saa osoitteesta portal-api.digitransit.fi."
         }
       },
       "reconfigure": {
         "title": "Digitransit Live",
         "data": {
-          "language": "Kieli"
+          "language": "Kieli",
+          "api_key": "Digitransitin API-avain"
         },
         "data_description": {
-          "language": "Kieli, jolla syötteisiin kirjoitetaan tekstit, kuten \"Linja 4\" ja ponnahdusikkunan rivit."
+          "language": "Kieli, jolla syötteisiin kirjoitetaan tekstit, kuten \"Linja 4\" ja ponnahdusikkunan rivit.",
+          "api_key": "Tarvitaan vain pysäkkien lähtöihin. Maksuttoman avaimen saa osoitteesta portal-api.digitransit.fi."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Digitransitin API-avain",
+        "description": "Digitransit ei hyväksynyt API-avainta, tai pysäkkejä lisättiin ilman avainta. Syötä avain osoitteesta portal-api.digitransit.fi.",
+        "data": {
+          "api_key": "Digitransitin API-avain"
         }
       }
     },
+    "error": {
+      "invalid_api_key": "Digitransit ei hyväksynyt tätä API-avainta.",
+      "cannot_connect": "Digitransitiin ei saatu yhteyttä. Yritä hetken kuluttua uudelleen."
+    },
     "abort": {
       "single_instance_allowed": "Digitransit Live on jo käytössä. Lisää syötteitä integraation sivulta.",
-      "reconfigure_successful": "Asetukset tallennettu."
+      "reconfigure_successful": "Asetukset tallennettu.",
+      "reauth_successful": "API-avain tallennettu."
     }
   },
   "config_subentries": {
@@ -84,6 +100,76 @@
       },
       "abort": {
         "reconfigure_successful": "Syöte tallennettu."
+      }
+    },
+    "departures": {
+      "entry_type": "Pysäkin lähdöt",
+      "initiate_flow": {
+        "user": "Lisää pysäkin lähdöt",
+        "reconfigure": "Muokkaa pysäkin lähtöjä"
+      },
+      "step": {
+        "user": {
+          "title": "Pysäkin lähdöt",
+          "description": "Valitse alue, jonka pysäkit haluat nähdä.",
+          "data": {
+            "region": "Alue"
+          },
+          "data_description": {
+            "region": "Kaupungin joukkoliikenne tai laajempi alue, kuten HSL-alue."
+          }
+        },
+        "location": {
+          "title": "Pysäkin lähdöt",
+          "description": "Siirrä merkki pysäkkisi lähelle ja valitse Seuraava. Merkki on aluksi alueen {region} vilkkaimmassa kohdassa.",
+          "data": {
+            "location": "Kartta"
+          },
+          "data_description": {
+            "location": "Seuraavassa vaiheessa näet merkkiä lähimmät pysäkit."
+          }
+        },
+        "stop": {
+          "title": "Pysäkin lähdöt",
+          "description": "Merkkiä lähimmät pysäkit, lähin ensin. Jos pysäkkisi ei ole listassa, valitse viimeinen vaihtoehto ja siirrä merkkiä.",
+          "data": {
+            "stop": "Pysäkki",
+            "departures": "Lähtöjen määrä",
+            "lines": "Linjat",
+            "update_seconds": "Päivitysväli"
+          },
+          "data_description": {
+            "stop": "Pysäkit ovat usein pareittain kadun eri puolilla.",
+            "departures": "Sensorin tila on seuraava lähtö, muut ovat sen attribuuteissa.",
+            "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
+            "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein."
+          }
+        },
+        "reconfigure": {
+          "title": "Pysäkin lähdöt",
+          "description": "Lähdöt pysäkiltä {stop}.",
+          "data": {
+            "departures": "Lähtöjen määrä",
+            "lines": "Linjat",
+            "update_seconds": "Päivitysväli"
+          },
+          "data_description": {
+            "departures": "Sensorin tila on seuraava lähtö, muut ovat sen attribuuteissa.",
+            "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
+            "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein."
+          }
+        }
+      },
+      "error": {
+        "no_stops": "Täältä ei löytynyt pysäkkejä.",
+        "invalid_api_key": "Digitransit ei hyväksynyt API-avainta. Vaihda se integraation asetuksista.",
+        "cannot_connect": "Digitransitiin ei saatu yhteyttä. Yritä hetken kuluttua uudelleen."
+      },
+      "abort": {
+        "api_key_missing": "Pysäkin lähtöihin tarvitaan Digitransitin API-avain. Lisää se ensin integraation asetuksiin.",
+        "invalid_api_key": "Digitransit ei hyväksynyt API-avainta. Vaihda se integraation asetuksista.",
+        "cannot_connect": "Digitransitiin ei saatu yhteyttä. Yritä hetken kuluttua uudelleen.",
+        "reconfigure_successful": "Pysäkki tallennettu."
       }
     }
   },

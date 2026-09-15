@@ -3,27 +3,43 @@
     "step": {
       "user": {
         "title": "Digitransit Live",
-        "description": "Live buses, trams and other public transport vehicles from Digitransit, as map feeds. Once this is set up, add feeds from the integration page.",
+        "description": "Live buses, trams and other public transport vehicles from Digitransit, as map feeds, and departures from stops. Once this is set up, add feeds and stops from the integration page.",
         "data": {
-          "language": "Language"
+          "language": "Language",
+          "api_key": "Digitransit API key"
         },
         "data_description": {
-          "language": "Language of the texts written into feeds, such as \"Line 4\" and popup rows."
+          "language": "Language of the texts written into feeds, such as \"Line 4\" and popup rows.",
+          "api_key": "Needed only for stop departures. Get a free subscription key at portal-api.digitransit.fi."
         }
       },
       "reconfigure": {
         "title": "Digitransit Live",
         "data": {
-          "language": "Language"
+          "language": "Language",
+          "api_key": "Digitransit API key"
         },
         "data_description": {
-          "language": "Language of the texts written into feeds, such as \"Line 4\" and popup rows."
+          "language": "Language of the texts written into feeds, such as \"Line 4\" and popup rows.",
+          "api_key": "Needed only for stop departures. Get a free subscription key at portal-api.digitransit.fi."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Digitransit API key",
+        "description": "Digitransit didn't accept the API key, or stops were added without one. Enter a subscription key from portal-api.digitransit.fi.",
+        "data": {
+          "api_key": "Digitransit API key"
         }
       }
     },
+    "error": {
+      "invalid_api_key": "Digitransit didn't accept this API key.",
+      "cannot_connect": "Digitransit couldn't be reached. Try again in a moment."
+    },
     "abort": {
       "single_instance_allowed": "Digitransit Live is already set up. Add more feeds from the integration page.",
-      "reconfigure_successful": "Settings saved."
+      "reconfigure_successful": "Settings saved.",
+      "reauth_successful": "API key saved."
     }
   },
   "config_subentries": {
@@ -84,6 +100,76 @@
       },
       "abort": {
         "reconfigure_successful": "Feed saved."
+      }
+    },
+    "departures": {
+      "entry_type": "Stop departures",
+      "initiate_flow": {
+        "user": "Add stop departures",
+        "reconfigure": "Change stop departures"
+      },
+      "step": {
+        "user": {
+          "title": "Stop departures",
+          "description": "Pick the region whose stops you want to see.",
+          "data": {
+            "region": "Region"
+          },
+          "data_description": {
+            "region": "A city's public transport, or a wider area such as the Helsinki region."
+          }
+        },
+        "location": {
+          "title": "Stop departures",
+          "description": "Move the pin close to your stop and select Next. It starts at the busiest spot in {region}.",
+          "data": {
+            "location": "Map"
+          },
+          "data_description": {
+            "location": "The next step lists the stops nearest the pin."
+          }
+        },
+        "stop": {
+          "title": "Stop departures",
+          "description": "The stops nearest the pin, nearest first. If your stop isn't listed, choose the last option to move the pin.",
+          "data": {
+            "stop": "Stop",
+            "departures": "Number of departures",
+            "lines": "Lines",
+            "update_seconds": "Update interval"
+          },
+          "data_description": {
+            "stop": "Stops often come in pairs, on opposite sides of the street.",
+            "departures": "The sensor's state is the next departure; the rest are in its attributes.",
+            "lines": "Line numbers such as 4 or 8A. Leave empty for every line.",
+            "update_seconds": "How often departures are fetched, at least every 30 seconds."
+          }
+        },
+        "reconfigure": {
+          "title": "Stop departures",
+          "description": "Departures from {stop}.",
+          "data": {
+            "departures": "Number of departures",
+            "lines": "Lines",
+            "update_seconds": "Update interval"
+          },
+          "data_description": {
+            "departures": "The sensor's state is the next departure; the rest are in its attributes.",
+            "lines": "Line numbers such as 4 or 8A. Leave empty for every line.",
+            "update_seconds": "How often departures are fetched, at least every 30 seconds."
+          }
+        }
+      },
+      "error": {
+        "no_stops": "No stops found here.",
+        "invalid_api_key": "Digitransit didn't accept the API key. Change it in the integration's settings.",
+        "cannot_connect": "Digitransit couldn't be reached. Try again in a moment."
+      },
+      "abort": {
+        "api_key_missing": "Stop departures need a Digitransit API key. Add one in the integration's settings first.",
+        "invalid_api_key": "Digitransit didn't accept the API key. Change it in the integration's settings.",
+        "cannot_connect": "Digitransit couldn't be reached. Try again in a moment.",
+        "reconfigure_successful": "Stop saved."
       }
     }
   },

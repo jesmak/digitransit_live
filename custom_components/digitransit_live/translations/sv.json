@@ -3,27 +3,43 @@
     "step": {
       "user": {
         "title": "Digitransit Live",
-        "description": "Bussar, spårvagnar och andra kollektivtrafikfordon i realtid från Digitransit, som kartflöden. Lägg till flöden från integrationens sida när detta är klart.",
+        "description": "Bussar, spårvagnar och andra kollektivtrafikfordon i realtid från Digitransit, som kartflöden, och avgångar från hållplatser. Lägg till flöden och hållplatser från integrationens sida när detta är klart.",
         "data": {
-          "language": "Språk"
+          "language": "Språk",
+          "api_key": "Digitransits API-nyckel"
         },
         "data_description": {
-          "language": "Språket för texterna i flödena, till exempel \"Linje 4\" och rader i popupfönster."
+          "language": "Språket för texterna i flödena, till exempel \"Linje 4\" och rader i popupfönster.",
+          "api_key": "Behövs bara för avgångar från hållplatser. En kostnadsfri nyckel fås på portal-api.digitransit.fi."
         }
       },
       "reconfigure": {
         "title": "Digitransit Live",
         "data": {
-          "language": "Språk"
+          "language": "Språk",
+          "api_key": "Digitransits API-nyckel"
         },
         "data_description": {
-          "language": "Språket för texterna i flödena, till exempel \"Linje 4\" och rader i popupfönster."
+          "language": "Språket för texterna i flödena, till exempel \"Linje 4\" och rader i popupfönster.",
+          "api_key": "Behövs bara för avgångar från hållplatser. En kostnadsfri nyckel fås på portal-api.digitransit.fi."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Digitransits API-nyckel",
+        "description": "Digitransit godkände inte API-nyckeln, eller så lades hållplatser till utan nyckel. Ange en nyckel från portal-api.digitransit.fi.",
+        "data": {
+          "api_key": "Digitransits API-nyckel"
         }
       }
     },
+    "error": {
+      "invalid_api_key": "Digitransit godkände inte den här API-nyckeln.",
+      "cannot_connect": "Det gick inte att nå Digitransit. Försök igen om en stund."
+    },
     "abort": {
       "single_instance_allowed": "Digitransit Live är redan konfigurerat. Lägg till fler flöden från integrationens sida.",
-      "reconfigure_successful": "Inställningarna har sparats."
+      "reconfigure_successful": "Inställningarna har sparats.",
+      "reauth_successful": "API-nyckeln har sparats."
     }
   },
   "config_subentries": {
@@ -84,6 +100,76 @@
       },
       "abort": {
         "reconfigure_successful": "Flödet har sparats."
+      }
+    },
+    "departures": {
+      "entry_type": "Avgångar från hållplats",
+      "initiate_flow": {
+        "user": "Lägg till avgångar från hållplats",
+        "reconfigure": "Ändra avgångar från hållplats"
+      },
+      "step": {
+        "user": {
+          "title": "Avgångar från hållplats",
+          "description": "Välj regionen vars hållplatser du vill se.",
+          "data": {
+            "region": "Region"
+          },
+          "data_description": {
+            "region": "En stads kollektivtrafik eller ett större område, till exempel HRT-området."
+          }
+        },
+        "location": {
+          "title": "Avgångar från hållplats",
+          "description": "Flytta nålen nära din hållplats och välj Nästa. Den står först på den livligaste platsen i {region}.",
+          "data": {
+            "location": "Karta"
+          },
+          "data_description": {
+            "location": "I nästa steg listas hållplatserna närmast nålen."
+          }
+        },
+        "stop": {
+          "title": "Avgångar från hållplats",
+          "description": "Hållplatserna närmast nålen, närmast först. Om din hållplats inte finns i listan väljer du det sista alternativet och flyttar nålen.",
+          "data": {
+            "stop": "Hållplats",
+            "departures": "Antal avgångar",
+            "lines": "Linjer",
+            "update_seconds": "Uppdateringsintervall"
+          },
+          "data_description": {
+            "stop": "Hållplatser finns ofta i par, på olika sidor av gatan.",
+            "departures": "Sensorns tillstånd är nästa avgång, de övriga finns i dess attribut.",
+            "lines": "Linjenummer som 4 eller 8A. Lämna tomt för alla linjer.",
+            "update_seconds": "Hur ofta avgångarna hämtas, minst var 30:e sekund."
+          }
+        },
+        "reconfigure": {
+          "title": "Avgångar från hållplats",
+          "description": "Avgångar från {stop}.",
+          "data": {
+            "departures": "Antal avgångar",
+            "lines": "Linjer",
+            "update_seconds": "Uppdateringsintervall"
+          },
+          "data_description": {
+            "departures": "Sensorns tillstånd är nästa avgång, de övriga finns i dess attribut.",
+            "lines": "Linjenummer som 4 eller 8A. Lämna tomt för alla linjer.",
+            "update_seconds": "Hur ofta avgångarna hämtas, minst var 30:e sekund."
+          }
+        }
+      },
+      "error": {
+        "no_stops": "Inga hållplatser hittades här.",
+        "invalid_api_key": "Digitransit godkände inte API-nyckeln. Byt den i integrationens inställningar.",
+        "cannot_connect": "Det gick inte att nå Digitransit. Försök igen om en stund."
+      },
+      "abort": {
+        "api_key_missing": "Avgångar från hållplatser kräver en API-nyckel från Digitransit. Lägg först till den i integrationens inställningar.",
+        "invalid_api_key": "Digitransit godkände inte API-nyckeln. Byt den i integrationens inställningar.",
+        "cannot_connect": "Det gick inte att nå Digitransit. Försök igen om en stund.",
+        "reconfigure_successful": "Hållplatsen har sparats."
       }
     }
   },
