@@ -1,5 +1,6 @@
 {
   "line": "Line {line}",
   "departure": "Departure",
-  "vehicle": "Vehicle"
+  "vehicle": "Vehicle",
+  "move_pin": "Move the pin to see other stops"
 }
