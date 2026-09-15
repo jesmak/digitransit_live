@@ -1,0 +1,99 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Digitransit Live",
+        "description": "Digitransitin bussit, raitiovaunut ja muut joukkoliikenteen ajoneuvot reaaliajassa karttasyötteinä. Lisää syötteet integraation sivulta, kun tämä on valmis.",
+        "data": {
+          "language": "Kieli"
+        },
+        "data_description": {
+          "language": "Kieli, jolla syötteisiin kirjoitetaan tekstit, kuten \"Linja 4\" ja ponnahdusikkunan rivit."
+        }
+      },
+      "reconfigure": {
+        "title": "Digitransit Live",
+        "data": {
+          "language": "Kieli"
+        },
+        "data_description": {
+          "language": "Kieli, jolla syötteisiin kirjoitetaan tekstit, kuten \"Linja 4\" ja ponnahdusikkunan rivit."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Digitransit Live on jo käytössä. Lisää syötteitä integraation sivulta.",
+      "reconfigure_successful": "Asetukset tallennettu."
+    }
+  },
+  "config_subentries": {
+    "vehicles": {
+      "entry_type": "Ajoneuvosyöte",
+      "initiate_flow": {
+        "user": "Lisää ajoneuvosyöte",
+        "reconfigure": "Muokkaa ajoneuvosyötettä"
+      },
+      "step": {
+        "user": {
+          "title": "Ajoneuvosyöte",
+          "description": "Joukkoliikenteen ajoneuvot, jotka lähettävät sijaintinsa Digitransitiin.",
+          "data": {
+            "name": "Nimi",
+            "feed": "Alue",
+            "lines": "Linjat",
+            "use_area": "Rajaa alueeseen",
+            "area": "Alue",
+            "max_age_minutes": "Sijainnin enimmäisikä",
+            "update_seconds": "Päivitysväli"
+          },
+          "data_description": {
+            "name": "Myös syötteen sensorin nimi.",
+            "feed": "Alueen syöte Digitransitissa. Valitse listasta tai kirjoita muu syötteen tunnus.",
+            "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
+            "area": "Käytössä vain, kun \"Rajaa alueeseen\" on päällä.",
+            "max_age_minutes": "Ajoneuvot, jotka eivät ole ilmoittaneet sijaintiaan tätä kauemmin, jätetään pois.",
+            "update_seconds": "Kuinka usein sensori päivitetään. Ajoneuvot ilmoittavat sijaintinsa noin kerran sekunnissa."
+          }
+        },
+        "reconfigure": {
+          "title": "Ajoneuvosyöte",
+          "description": "Joukkoliikenteen ajoneuvot, jotka lähettävät sijaintinsa Digitransitiin.",
+          "data": {
+            "name": "Nimi",
+            "feed": "Alue",
+            "lines": "Linjat",
+            "use_area": "Rajaa alueeseen",
+            "area": "Alue",
+            "max_age_minutes": "Sijainnin enimmäisikä",
+            "update_seconds": "Päivitysväli"
+          },
+          "data_description": {
+            "name": "Myös syötteen sensorin nimi.",
+            "feed": "Alueen syöte Digitransitissa. Valitse listasta tai kirjoita muu syötteen tunnus.",
+            "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
+            "area": "Käytössä vain, kun \"Rajaa alueeseen\" on päällä.",
+            "max_age_minutes": "Ajoneuvot, jotka eivät ole ilmoittaneet sijaintiaan tätä kauemmin, jätetään pois.",
+            "update_seconds": "Kuinka usein sensori päivitetään. Ajoneuvot ilmoittavat sijaintinsa noin kerran sekunnissa."
+          }
+        }
+      },
+      "error": {
+        "invalid_feed": "Syötteen tunnuksessa voi olla vain kirjaimia, numeroita, - ja _.",
+        "invalid_line": "Linjanumerossa ei voi olla välilyöntejä eikä merkkejä /, # tai +.",
+        "area_radius": "Aseta säde vetämällä ympyrän reunaa kartalla."
+      },
+      "abort": {
+        "reconfigure_successful": "Syöte tallennettu."
+      }
+    }
+  },
+  "selector": {
+    "language": {
+      "options": {
+        "fi": "Suomi",
+        "sv": "Svenska",
+        "en": "English"
+      }
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Digitransit Live",
+        "description": "Bussar, spårvagnar och andra kollektivtrafikfordon i realtid från Digitransit, som kartflöden. Lägg till flöden från integrationens sida när detta är klart.",
+        "data": {
+          "language": "Språk"
+        },
+        "data_description": {
+          "language": "Språket för texterna i flödena, till exempel \"Linje 4\" och rader i popupfönster."
+        }
+      },
+      "reconfigure": {
+        "title": "Digitransit Live",
+        "data": {
+          "language": "Språk"
+        },
+        "data_description": {
+          "language": "Språket för texterna i flödena, till exempel \"Linje 4\" och rader i popupfönster."
+        }
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Digitransit Live är redan konfigurerat. Lägg till fler flöden från integrationens sida.",
+      "reconfigure_successful": "Inställningarna har sparats."
+    }
+  },
+  "config_subentries": {
+    "vehicles": {
+      "entry_type": "Fordonsflöde",
+      "initiate_flow": {
+        "user": "Lägg till fordonsflöde",
+        "reconfigure": "Ändra fordonsflöde"
+      },
+      "step": {
+        "user": {
+          "title": "Fordonsflöde",
+          "description": "Kollektivtrafikfordon som rapporterar sin position till Digitransit.",
+          "data": {
+            "name": "Namn",
+            "feed": "Region",
+            "lines": "Linjer",
+            "use_area": "Begränsa till ett område",
+            "area": "Område",
+            "max_age_minutes": "Positionens maximala ålder",
+            "update_seconds": "Uppdateringsintervall"
+          },
+          "data_description": {
+            "name": "Även namnet på flödets sensor.",
+            "feed": "Regionens flöde i Digitransit. Välj i listan eller skriv ett annat flödes-id.",
+            "lines": "Linjenummer som 4 eller 8A. Lämna tomt för alla linjer.",
+            "area": "Används endast när \"Begränsa till ett område\" är på.",
+            "max_age_minutes": "Fordon som inte har rapporterat på längre tid utelämnas.",
+            "update_seconds": "Hur ofta sensorn uppdateras. Fordonen rapporterar ungefär en gång i sekunden."
+          }
+        },
+        "reconfigure": {
+          "title": "Fordonsflöde",
+          "description": "Kollektivtrafikfordon som rapporterar sin position till Digitransit.",
+          "data": {
+            "name": "Namn",
+            "feed": "Region",
+            "lines": "Linjer",
+            "use_area": "Begränsa till ett område",
+            "area": "Område",
+            "max_age_minutes": "Positionens maximala ålder",
+            "update_seconds": "Uppdateringsintervall"
+          },
+          "data_description": {
+            "name": "Även namnet på flödets sensor.",
+            "feed": "Regionens flöde i Digitransit. Välj i listan eller skriv ett annat flödes-id.",
+            "lines": "Linjenummer som 4 eller 8A. Lämna tomt för alla linjer.",
+            "area": "Används endast när \"Begränsa till ett område\" är på.",
+            "max_age_minutes": "Fordon som inte har rapporterat på längre tid utelämnas.",
+            "update_seconds": "Hur ofta sensorn uppdateras. Fordonen rapporterar ungefär en gång i sekunden."
+          }
+        }
+      },
+      "error": {
+        "invalid_feed": "Ett flödes-id får bara innehålla bokstäver, siffror, - och _.",
+        "invalid_line": "Ett linjenummer får inte innehålla mellanslag, /, # eller +.",
+        "area_radius": "Dra i cirkelns kant på kartan för att ange en radie."
+      },
+      "abort": {
+        "reconfigure_successful": "Flödet har sparats."
+      }
+    }
+  },
+  "selector": {
+    "language": {
+      "options": {
+        "fi": "Suomi",
+        "sv": "Svenska",
+        "en": "English"
+      }
+    }
+  }
+}
