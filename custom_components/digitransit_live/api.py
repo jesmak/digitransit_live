@@ -94,7 +94,7 @@ class RoutingClient:
                     raise DigitransitError(f"Digitransit's routing API answered with status {response.status}")
                 body = await response.json(content_type=None)
         except (aiohttp.ClientError, TimeoutError, ValueError) as err:
-            raise DigitransitError(f"Digitransit's routing API couldn't be reached: {err}") from err
+            raise DigitransitError(f"Digitransit's routing API couldn't be reached: {err!r}") from err
         if not isinstance(body, dict):
             raise DigitransitError("Digitransit's routing API sent an unexpected response")
         if errors := body.get("errors"):
