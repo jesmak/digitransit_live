@@ -116,72 +116,50 @@ unavailable when the broker connection is lost and no vehicle has reported withi
 
 ### Stop departures
 
-The state is the time of the next departure: the real-time estimate when the vehicle is tracked, otherwise the
-timetable time. The sensor is named after the stop, for example `sensor.kauppatori_h0453`.
+The state is the time of the next departure that isn't cancelled: the real-time estimate when the vehicle is tracked,
+otherwise the timetable time. The sensor is named after the stop, for example `sensor.kauppatori_h0453`. The attributes
+follow the [departures format](https://github.com/jesmak/departures-card/blob/main/docs/departures-format.md), which
+[departures-card](https://github.com/jesmak/departures-card) shows.
 
-| Attribute     | Description                                      |
-| ------------- | ------------------------------------------------ |
-| `stop_id`     | The stop's id in Digitransit, e.g. `HSL:1020453` |
-| `stop_name`   | The stop's name                                  |
-| `stop_code`   | The code shown at the stop, e.g. `H0453`         |
-| `departures`  | The next departures, soonest first               |
-| `attribution` | Data credit                                      |
+| Attribute            | Description                                      |
+| -------------------- | ------------------------------------------------ |
+| `departures_version` | Version of the departures format, `1`            |
+| `stop_id`            | The stop's id in Digitransit, e.g. `HSL:1020453` |
+| `stop_name`          | The stop's name                                  |
+| `stop_code`          | The code shown at the stop, e.g. `H0453`         |
+| `departures`         | The next departures, soonest first               |
+| `attribution`        | Data credit                                      |
 
 Each departure has:
 
-| Key         | Description                                                  |
-| ----------- | ------------------------------------------------------------ |
-| `line`      | Line number                                                  |
-| `headsign`  | Destination                                                  |
-| `mode`      | Vehicle type, e.g. `BUS`, `TRAM` or `RAIL`                   |
-| `scheduled` | Departure time in the timetable                              |
-| `estimated` | Real-time estimate, or the timetable time when there is none |
-| `delay`     | Seconds late; negative when early                            |
-| `realtime`  | Whether `estimated` comes from a tracked vehicle             |
-| `platform`  | Platform or track, when the stop has one                     |
+| Key         | Description                                                          |
+| ----------- | -------------------------------------------------------------------- |
+| `id`        | The trip and its service day, the same on every update               |
+| `line`      | Line number                                                          |
+| `mode`      | Vehicle type: `bus`, `tram`, `metro`, `train`, `ferry` or `other`    |
+| `headsign`  | Destination                                                          |
+| `scheduled` | Departure time in the timetable                                      |
+| `estimated` | Real-time estimate, or the timetable time when there is none         |
+| `realtime`  | Whether `estimated` comes from a tracked vehicle                     |
+| `delay`     | Seconds late; negative when early                                    |
+| `platform`  | Platform or track, when the stop has one                             |
+| `cancelled` | `true` when the trip is cancelled                                    |
+| `color`     | The line's own colour, when the region gives one                     |
 
-Cancelled trips are left out, and so are arrivals at a line's last stop. Only the next departure time is stored in the
+Keys with no value are left out. Cancelled trips stay in the list, marked `cancelled`, so you know not to wait for them.
+Arrivals at a line's last stop are left out, since nobody can board them. Only the next departure time is stored in the
 recorder, not the list. If Digitransit refuses the API key, the sensors become unavailable and Home Assistant asks for
 a new key on the integration page.
 
 #### Dashboard card
 
-<img src="docs/images/departures-card.png" alt="The next five departures from a stop, each with its line, destination and time" width="400">
-
-The card lists the next five departures. On the right is how soon each leaves: "Nyt" (now), minutes, or the time
-when it's an hour or more away. Tracked vehicles get a live icon, and their delay when they're a minute or more late
-or early. It uses the [HTML Jinja2 Template card](https://github.com/PiotrMachowski/Home-Assistant-Lovelace-HTML-Jinja2-Template-card),
-installed from HACS. The texts are in Finnish, as in the screenshot; change the stop's entity id in the first line.
+[departures-card](https://github.com/jesmak/departures-card) shows the departures: the next one large with a
+countdown, the ones after it below, and several stops in one card, such as both sides of a street.
 
 ```yaml
-type: custom:html-template-card
-title: Kivisalmi – seuraavat lähdöt
-ignore_line_breaks: true
-content: |
-  {%- set s = 'sensor.kivisalmi' -%}
-  {%- set departures = (state_attr(s, 'departures') or [])[:5] -%}
-  {%- set t = as_timestamp(now()) -%}
-  {%- if not departures -%}
-  <div style="padding: 8px 0; color: var(--secondary-text-color)">Ei tulevia lähtöjä</div>
-  {%- endif -%}
-  {%- for d in departures -%}
-  {%- set estimated = as_timestamp(d.estimated) -%}
-  {%- set minutes = ((estimated - t) / 60) | round(0, 'floor') | int -%}
-  {%- set delay = ((d.delay or 0) / 60) | round | int -%}
-  {%- set clock = estimated | timestamp_custom('%H.%M') -%}
-  <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0{{ '' if loop.first else '; border-top: 1px solid var(--divider-color)' }}">
-  <div style="flex: none; min-width: 20px; padding: 2px 8px; border-radius: 12px; background: var(--primary-color); color: var(--text-primary-color, white); font-weight: var(--ha-font-weight-bold, 600); text-align: center">{{ d.line | e }}</div>
-  <div style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.headsign | e }}</div>
-  <div style="flex: none; text-align: right; font-variant-numeric: tabular-nums; line-height: 20px">
-  <div style="font-weight: var(--ha-font-weight-bold, 600)">{{ 'Nyt' if minutes < 1 else (minutes ~ ' min' if minutes < 60 else clock) }}</div>
-  <div style="display: flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 12px; color: var(--secondary-text-color)">
-  {%- if d.realtime -%}<ha-icon icon="mdi:access-point" style="--mdc-icon-size: 14px; color: var(--success-color)"></ha-icon>{%- endif -%}
-  {%- if minutes < 60 -%}<span>{{ clock }}</span>{%- endif -%}
-  {%- if d.realtime and delay != 0 -%}<span style="color: {{ 'var(--warning-color)' if delay > 0 else 'var(--success-color)' }}">{{ '%+d' | format(delay) }} min</span>{%- endif -%}
-  </div>
-  </div>
-  </div>
-  {%- endfor -%}
+type: custom:departures-card
+entities:
+  - sensor.kauppatori_h0453
 ```
 
 ## How it works

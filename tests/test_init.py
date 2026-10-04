@@ -157,6 +157,7 @@ async def test_departures_sensor(
     state = hass.states.get("sensor.kauppatori_h0453")
     assert state.state == "2026-09-15T09:01:30+00:00", "the next departure's real-time estimate"
     assert state.attributes["device_class"] == "timestamp"
+    assert state.attributes["departures_version"] == 1
     assert state.attributes["stop_name"] == "Kauppatori"
     assert state.attributes["stop_code"] == "H0453"
     assert [departure["line"] for departure in state.attributes["departures"]] == ["4", "16"]

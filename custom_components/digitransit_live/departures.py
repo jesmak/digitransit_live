@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import heapq
 import math
+import re
 import statistics
 from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
@@ -15,9 +16,14 @@ from homeassistant.util import dt as dt_util
 
 from .const import CONF_DEPARTURES, CONF_LINES, CONF_ROUTER, CONF_STOP, DEFAULT_DEPARTURES, REGION_NAMES
 
-# With a line filter, more departures are fetched so that enough of the chosen lines remain.
+# With a line filter, more departures are fetched so that enough of the chosen lines remain. Without one, twice as many:
+# at a line's last stop up to half of them are arrivals, which are dropped.
 FILTERED_FETCH_FACTOR = 4
+UNFILTERED_FETCH_FACTOR = 2
 MAX_FETCH = 100
+# The departures format's modes (departures-card), by the routing API's.
+MODES = {"BUS": "bus", "TRAM": "tram", "SUBWAY": "metro", "RAIL": "train", "FERRY": "ferry"}
+HEX_COLOR = re.compile(r"^[0-9a-fA-F]{6}$")
 # Languages that write decimals with a comma.
 DECIMAL_COMMA_LANGUAGES = frozenset({"fi", "sv"})
 
@@ -46,32 +52,40 @@ class DeparturesConfig:
 
     @property
     def fetch_count(self) -> int:
-        return min(self.count * FILTERED_FETCH_FACTOR, MAX_FETCH) if self.lines else self.count
+        return min(self.count * (FILTERED_FETCH_FACTOR if self.lines else UNFILTERED_FETCH_FACTOR), MAX_FETCH)
 
 
 @dataclass(frozen=True)
 class Departure:
+    id: str
     line: str
     headsign: str | None
-    mode: str | None
+    mode: str
     scheduled: datetime
     # The real-time estimate when there is one, otherwise the scheduled time.
     estimated: datetime
     delay_seconds: int
     realtime: bool
     platform: str | None
+    cancelled: bool
+    color: str | None
 
     def as_attribute(self) -> dict[str, Any]:
-        return {
+        """The departure in the departures format; fields with no value are left out."""
+        attribute = {
+            "id": self.id,
             "line": self.line,
-            "headsign": self.headsign,
             "mode": self.mode,
+            "headsign": self.headsign,
             "scheduled": self.scheduled.isoformat(),
             "estimated": self.estimated.isoformat(),
-            "delay": self.delay_seconds,
             "realtime": self.realtime,
+            "delay": self.delay_seconds,
             "platform": self.platform,
+            "cancelled": self.cancelled or None,
+            "color": self.color,
         }
+        return {key: value for key, value in attribute.items() if value is not None}
 
 
 @dataclass(frozen=True)
@@ -81,9 +95,14 @@ class StopDepartures:
     code: str | None
     departures: list[Departure]
 
+    @property
+    def next_departure(self) -> Departure | None:
+        """The first departure that isn't cancelled."""
+        return next((departure for departure in self.departures if not departure.cancelled), None)
+
 
 def parse_departures(stop: Mapping[str, Any], config: DeparturesConfig) -> StopDepartures:
-    """The stop's next departures in order, limited to the chosen lines and count."""
+    """The stop's next departures in order, limited to the chosen lines and count. Cancelled ones stay in the list."""
     departures = []
     for stoptime in stop.get("stoptimesWithoutPatterns") or []:
         departure = parse_departure(stoptime)
@@ -100,24 +119,36 @@ def parse_departures(stop: Mapping[str, Any], config: DeparturesConfig) -> StopD
 
 
 def parse_departure(stoptime: Mapping[str, Any]) -> Departure | None:
-    """One departure. Times are seconds from the start of the service day, which is a Unix time."""
+    """One departure, or None for an arrival at the trip's last stop, which can't be boarded.
+
+    Times are seconds from the start of the service day, which is a Unix time. omitNonPickups doesn't catch the
+    arrivals: the regions' data marks them as boardable. The last stop is compared by position, not by stop, so that
+    a circular line's departure from the stop it ends at stays.
+    """
     service_day = stoptime.get("serviceDay")
     scheduled = stoptime.get("scheduledDeparture")
-    if not is_int(service_day) or not is_int(scheduled) or stoptime.get("realtimeState") == "CANCELED":
+    if not is_int(service_day) or not is_int(scheduled):
+        return None
+    trip = stoptime.get("trip") or {}
+    last_position = (trip.get("arrivalStoptime") or {}).get("stopPosition")
+    if is_int(last_position) and stoptime.get("stopPosition") == last_position:
         return None
     realtime_departure = stoptime.get("realtimeDeparture")
     estimated = realtime_departure if is_int(realtime_departure) else scheduled
-    trip = stoptime.get("trip") or {}
     route = trip.get("route") or {}
+    color = route.get("color")
     return Departure(
+        id=f"trip:{trip.get('gtfsId')}/{service_day}",
         line=str(route.get("shortName") or route.get("longName") or ""),
         headsign=stoptime.get("headsign") or trip.get("tripHeadsign"),
-        mode=route.get("mode"),
+        mode=MODES.get(str(route.get("mode")), "other"),
         scheduled=dt_util.utc_from_timestamp(service_day + scheduled),
         estimated=dt_util.utc_from_timestamp(service_day + estimated),
         delay_seconds=int(stoptime.get("departureDelay") or 0),
         realtime=bool(stoptime.get("realtime")),
         platform=(stoptime.get("stop") or {}).get("platformCode"),
+        cancelled=stoptime.get("realtimeState") == "CANCELED",
+        color=f"#{color.lower()}" if isinstance(color, str) and HEX_COLOR.match(color) else None,
     )
 
 

@@ -15,14 +15,14 @@ from custom_components.digitransit_live.departures import (
     stop_title,
 )
 
-from .conftest import NOON, REGION_STOPS, SERVICE_DAY, STOP
+from .conftest import NOON, REGION_STOPS, SERVICE_DAY, STOP, stoptime
 
 
 def config(**values: object) -> DeparturesConfig:
     return DeparturesConfig.from_data({"router": "hsl", "stop": "HSL:1020453", "departures": 5} | values)
 
 
-def test_departures_are_in_order_without_cancelled_trips() -> None:
+def test_departures_are_in_order_without_arrivals() -> None:
     result = parse_departures(STOP, config(departures=2))
 
     assert (result.stop_id, result.name, result.code) == ("HSL:1020453", "Kauppatori", "H0453")
@@ -32,21 +32,80 @@ def test_departures_are_in_order_without_cancelled_trips() -> None:
     assert tram.estimated == dt_util.utc_from_timestamp(SERVICE_DAY + NOON + 90)
     assert tram.scheduled == dt_util.utc_from_timestamp(SERVICE_DAY + NOON + 120)
     assert bus.as_attribute() == {
+        "id": f"trip:HSL:1016_{NOON + 300}/{SERVICE_DAY}",
         "line": "16",
+        "mode": "bus",
         "headsign": "Katajanokka",
-        "mode": "BUS",
         "scheduled": "2026-09-15T09:05:00+00:00",
         "estimated": "2026-09-15T09:06:30+00:00",
-        "delay": 90,
         "realtime": True,
+        "delay": 90,
         "platform": "1",
+        "color": "#007ac9",
     }
+    assert tram.as_attribute().keys() == {
+        "id",
+        "line",
+        "mode",
+        "headsign",
+        "scheduled",
+        "estimated",
+        "realtime",
+        "delay",
+    }
+
+
+def test_cancelled_departures_stay_but_are_never_next() -> None:
+    result = parse_departures(STOP, config())
+
+    assert [(departure.line, departure.cancelled) for departure in result.departures] == [
+        ("4", False),
+        ("16", False),
+        ("16", False),
+        ("2", True),
+    ]
+    assert result.departures[-1].as_attribute()["cancelled"] is True
+    assert result.next_departure is result.departures[0]
+
+    only_cancelled = parse_departures(STOP, config(lines=["2"]))
+    assert only_cancelled.next_departure is None
+
+
+def test_a_circular_line_departs_from_the_stop_it_ends_at() -> None:
+    stop = {
+        "gtfsId": "HSL:1",
+        "name": "X",
+        "stoptimesWithoutPatterns": [
+            stoptime("90", "Ympyrä", NOON, position=1, last_position=30),
+            stoptime("90", "Ympyrä", NOON + 60, position=30, last_position=30),
+        ],
+    }
+    assert [departure.scheduled for departure in parse_departures(stop, config()).departures] == [
+        dt_util.utc_from_timestamp(SERVICE_DAY + NOON)
+    ]
+
+
+def test_modes_are_the_departures_formats() -> None:
+    stop = {
+        "gtfsId": "HSL:1",
+        "name": "X",
+        "stoptimesWithoutPatterns": [
+            stoptime(line, "Y", NOON + index, mode=mode)
+            for index, (line, mode) in enumerate([("M1", "SUBWAY"), ("P", "RAIL"), ("19", "FERRY"), ("F", "FUNICULAR")])
+        ],
+    }
+    assert [departure.mode for departure in parse_departures(stop, config()).departures] == [
+        "metro",
+        "train",
+        "ferry",
+        "other",
+    ]
 
 
 def test_lines_filter_departures_and_fetch_more() -> None:
     only_16 = config(lines=[" 16 "])
     assert only_16.fetch_count == 20
-    assert config().fetch_count == 5
+    assert config().fetch_count == 10, "twice the count, for the arrivals that are dropped"
 
     result = parse_departures(STOP, only_16)
     assert [departure.line for departure in result.departures] == ["16", "16"]

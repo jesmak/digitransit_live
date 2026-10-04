@@ -48,15 +48,21 @@ query StopDepartures($id: String!, $count: Int!) {
       realtimeState
       serviceDay
       headsign
+      stopPosition
       stop {
         platformCode
       }
       trip {
+        gtfsId
         tripHeadsign
         route {
           shortName
           longName
           mode
+          color
+        }
+        arrivalStoptime {
+          stopPosition
         }
       }
     }

@@ -34,6 +34,9 @@ def stoptime(
     mode: str = "BUS",
     platform: str | None = None,
     state: str | None = None,
+    color: str | None = None,
+    position: int = 5,
+    last_position: int = 20,
 ) -> dict[str, Any]:
     return {
         "scheduledDeparture": scheduled,
@@ -43,8 +46,14 @@ def stoptime(
         "realtimeState": state or ("UPDATED" if realtime else "SCHEDULED"),
         "serviceDay": SERVICE_DAY,
         "headsign": headsign,
+        "stopPosition": position,
         "stop": {"platformCode": platform},
-        "trip": {"tripHeadsign": headsign, "route": {"shortName": line, "longName": None, "mode": mode}},
+        "trip": {
+            "gtfsId": f"HSL:10{line}_{scheduled}",
+            "tripHeadsign": headsign,
+            "route": {"shortName": line, "longName": None, "mode": mode, "color": color},
+            "arrivalStoptime": {"stopPosition": last_position},
+        },
     }
 
 
@@ -53,10 +62,12 @@ STOP = {
     "name": "Kauppatori",
     "code": "H0453",
     "stoptimesWithoutPatterns": [
-        stoptime("16", "Katajanokka", NOON + 5 * 60, delay=90, platform="1"),
+        stoptime("16", "Katajanokka", NOON + 5 * 60, delay=90, platform="1", color="007AC9"),
         stoptime("4", "Munkkiniemi", NOON + 2 * 60, delay=-30, mode="TRAM"),
         stoptime("16", "Katajanokka", NOON + 20 * 60, realtime=False),
         stoptime("2", "Pasila", NOON + 25 * 60, mode="TRAM", state="CANCELED"),
+        # A line 16 bus ending its trip here: an arrival, not a departure.
+        stoptime("16", "Kauppatori", NOON + 4 * 60, position=20, last_position=20),
     ],
 }
 

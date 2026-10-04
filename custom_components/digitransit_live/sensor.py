@@ -3,7 +3,9 @@
 A feed sensor's state is the number of vehicles; the vehicles are in the
 `geojson` attribute, in the Map Feed format (docs/map-feed-format.md in
 ha-map-card-plugin-map-feed). A departure sensor's state is the time of the
-stop's next departure; the departures are in the `departures` attribute.
+stop's next departure that isn't cancelled; the departures are in the
+`departures` attribute, in the departures format (docs/departures-format.md in
+departures-card).
 """
 
 from __future__ import annotations
@@ -18,7 +20,7 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import ATTRIBUTION, DOMAIN, MAP_FEED_VERSION
+from .const import ATTRIBUTION, DEPARTURES_VERSION, DOMAIN, MAP_FEED_VERSION
 from .coordinator import DeparturesCoordinator, DigitransitConfigEntry, VehicleFeedCoordinator
 from .feed import feature_collection
 
@@ -72,7 +74,7 @@ class MapFeedSensor(CoordinatorEntity[VehicleFeedCoordinator], SensorEntity):
 
 
 class DeparturesSensor(CoordinatorEntity[DeparturesCoordinator], SensorEntity):
-    """The time of a stop's next departure, with the real-time estimate when there is one."""
+    """The time of a stop's next departure that isn't cancelled, with the real-time estimate when there is one."""
 
     # The departures change on every update; the next departure time is history enough.
     _unrecorded_attributes = frozenset({"departures"})
@@ -97,16 +99,20 @@ class DeparturesSensor(CoordinatorEntity[DeparturesCoordinator], SensorEntity):
     @property
     def native_value(self) -> datetime | None:
         data = self.coordinator.data
-        return data.departures[0].estimated if data and data.departures else None
+        departure = data.next_departure if data else None
+        return departure.estimated if departure else None
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         data = self.coordinator.data
         if data is None:
             return {}
-        return {
+        attributes: dict[str, Any] = {
+            "departures_version": DEPARTURES_VERSION,
             "stop_id": data.stop_id,
             "stop_name": data.name,
-            "stop_code": data.code,
-            "departures": [departure.as_attribute() for departure in data.departures],
         }
+        if data.code:
+            attributes["stop_code"] = data.code
+        attributes["departures"] = [departure.as_attribute() for departure in data.departures]
+        return attributes

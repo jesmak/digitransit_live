@@ -8,6 +8,8 @@ ATTRIBUTION: Final = "Digitransit, CC BY 4.0"
 
 # Version of the Map Feed format the sensors write (docs/map-feed-format.md in ha-map-card-plugin-map-feed).
 MAP_FEED_VERSION: Final = 1
+# Version of the departures format the departure sensors write (docs/departures-format.md in departures-card).
+DEPARTURES_VERSION: Final = 1
 
 # Languages for the texts the integration writes into feeds. Each needs a texts/<code>.json file.
 LANGUAGES: Final = ["fi", "sv", "en"]
