@@ -136,13 +136,15 @@
             "stop": "Hållplats",
             "departures": "Antal avgångar",
             "lines": "Linjer",
-            "update_seconds": "Uppdateringsintervall"
+            "update_seconds": "Uppdateringsintervall",
+            "alerts": "Störningsmeddelanden"
           },
           "data_description": {
             "stop": "Hållplatser finns ofta i par, på olika sidor av gatan.",
             "departures": "Sensorns tillstånd är nästa avgång, de övriga finns i dess attribut.",
             "lines": "Linjenummer som 4 eller 8A. Lämna tomt för alla linjer.",
-            "update_seconds": "Hur ofta avgångarna hämtas, minst var 30:e sekund."
+            "update_seconds": "Hur ofta avgångarna hämtas, minst var 30:e sekund.",
+            "alerts": "En linjes meddelande kan gälla vilken hållplats som helst på linjen. Trafikändringar är omledningar, inställd eller glesare trafik och förseningar."
           }
         },
         "reconfigure": {
@@ -151,12 +153,14 @@
           "data": {
             "departures": "Antal avgångar",
             "lines": "Linjer",
-            "update_seconds": "Uppdateringsintervall"
+            "update_seconds": "Uppdateringsintervall",
+            "alerts": "Störningsmeddelanden"
           },
           "data_description": {
             "departures": "Sensorns tillstånd är nästa avgång, de övriga finns i dess attribut.",
             "lines": "Linjenummer som 4 eller 8A. Lämna tomt för alla linjer.",
-            "update_seconds": "Hur ofta avgångarna hämtas, minst var 30:e sekund."
+            "update_seconds": "Hur ofta avgångarna hämtas, minst var 30:e sekund.",
+            "alerts": "En linjes meddelande kan gälla vilken hållplats som helst på linjen. Trafikändringar är omledningar, inställd eller glesare trafik och förseningar."
           }
         }
       },
@@ -179,6 +183,14 @@
         "fi": "Suomi",
         "sv": "Svenska",
         "en": "English"
+      }
+    },
+    "alerts": {
+      "options": {
+        "off": "Av",
+        "stop": "Hållplatsens egna",
+        "service_changes": "Hållplatsens egna och trafikändringar på dess linjer",
+        "all": "Hållplatsens egna och alla meddelanden för dess linjer"
       }
     }
   }

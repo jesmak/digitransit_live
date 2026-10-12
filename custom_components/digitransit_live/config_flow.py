@@ -41,6 +41,8 @@ from homeassistant.helpers.selector import (
 
 from .api import DigitransitAuthError, DigitransitError, RoutingClient
 from .const import (
+    ALERT_LEVELS,
+    CONF_ALERTS,
     CONF_API_KEY,
     CONF_AREA,
     CONF_DEPARTURES,
@@ -54,6 +56,7 @@ from .const import (
     CONF_STOP,
     CONF_UPDATE_SECONDS,
     CONF_USE_AREA,
+    DEFAULT_ALERTS,
     DEFAULT_DEPARTURE_UPDATE_SECONDS,
     DEFAULT_DEPARTURES,
     DEFAULT_MAX_AGE_MINUTES,
@@ -272,6 +275,7 @@ def clean(data: dict[str, Any]) -> dict[str, Any]:
 
 DEPARTURE_DEFAULTS: dict[str, Any] = {
     CONF_DEPARTURES: DEFAULT_DEPARTURES,
+    CONF_ALERTS: DEFAULT_ALERTS,
     CONF_UPDATE_SECONDS: DEFAULT_DEPARTURE_UPDATE_SECONDS,
 }
 
@@ -287,6 +291,9 @@ def departure_fields() -> dict[vol.Marker, Any]:
                 min=MIN_DEPARTURE_UPDATE_SECONDS, max=3600, step=1, unit_of_measurement="s", mode=NumberSelectorMode.BOX
             )
         ),
+        vol.Required(CONF_ALERTS): SelectSelector(
+            SelectSelectorConfig(options=ALERT_LEVELS, translation_key=CONF_ALERTS, mode=SelectSelectorMode.DROPDOWN)
+        ),
     }
 
 
@@ -297,6 +304,7 @@ def departure_settings(user_input: Mapping[str, Any]) -> dict[str, Any]:
         CONF_DEPARTURES: int(user_input[CONF_DEPARTURES]),
         CONF_LINES: list(dict.fromkeys(line for line in lines if line)),
         CONF_UPDATE_SECONDS: int(user_input[CONF_UPDATE_SECONDS]),
+        CONF_ALERTS: str(user_input[CONF_ALERTS]),
     }
 
 
@@ -392,7 +400,9 @@ class DeparturesFlow(ConfigSubentryFlow):
 
         if user_input is not None:
             self._settings = {
-                key: user_input[key] for key in (CONF_DEPARTURES, CONF_LINES, CONF_UPDATE_SECONDS) if key in user_input
+                key: user_input[key]
+                for key in (CONF_DEPARTURES, CONF_LINES, CONF_UPDATE_SECONDS, CONF_ALERTS)
+                if key in user_input
             }
             stop_id = str(user_input[CONF_STOP])
             if stop_id in listed:

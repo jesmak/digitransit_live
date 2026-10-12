@@ -4,8 +4,8 @@ A feed sensor's state is the number of vehicles; the vehicles are in the
 `geojson` attribute, in the Map Feed format (docs/map-feed-format.md in
 ha-map-card-plugin-map-feed). A departure sensor's state is the time of the
 stop's next departure that isn't cancelled; the departures are in the
-`departures` attribute, in the departures format (docs/departures-format.md in
-departures-card).
+`departures` attribute and the stop's service alerts in `notices`, in the
+departures format (docs/departures-format.md in departures-card).
 """
 
 from __future__ import annotations
@@ -77,7 +77,7 @@ class DeparturesSensor(CoordinatorEntity[DeparturesCoordinator], SensorEntity):
     """The time of a stop's next departure that isn't cancelled, with the real-time estimate when there is one."""
 
     # The departures change on every update; the next departure time is history enough.
-    _unrecorded_attributes = frozenset({"departures"})
+    _unrecorded_attributes = frozenset({"departures", "notices"})
     _attr_attribution = ATTRIBUTION
     _attr_device_class = SensorDeviceClass.TIMESTAMP
     _attr_has_entity_name = True
@@ -114,5 +114,7 @@ class DeparturesSensor(CoordinatorEntity[DeparturesCoordinator], SensorEntity):
         }
         if data.code:
             attributes["stop_code"] = data.code
+        if data.notices:
+            attributes["notices"] = data.notices
         attributes["departures"] = [departure.as_attribute() for departure in data.departures]
         return attributes

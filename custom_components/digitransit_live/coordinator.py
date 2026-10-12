@@ -132,4 +132,4 @@ class DeparturesCoordinator(DataUpdateCoordinator[StopDepartures]):
             raise UpdateFailed(str(err)) from err
         if stop is None:
             raise UpdateFailed(f"Digitransit doesn't know stop {config.stop_id}")
-        return parse_departures(stop, config)
+        return parse_departures(stop, config, self.config_entry.runtime_data.texts.language, dt_util.utcnow())

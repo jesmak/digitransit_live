@@ -38,6 +38,7 @@ CONF_UPDATE_SECONDS: Final = "update_seconds"
 CONF_ROUTER: Final = "router"
 CONF_STOP: Final = "stop"
 CONF_DEPARTURES: Final = "departures"
+CONF_ALERTS: Final = "alerts"
 # Used only while adding a stop.
 CONF_REGION: Final = "region"
 CONF_LOCATION: Final = "location"
@@ -53,6 +54,15 @@ MAX_DEPARTURES: Final = 20
 # Timetables and delay estimates change slowly; polling more often only spends the API quota.
 MIN_DEPARTURE_UPDATE_SECONDS: Final = 30
 DEFAULT_DEPARTURE_UPDATE_SECONDS: Final = 60
+
+# Which service alerts a stop shows: none, the stop's own, also its lines' alerts that change the trip, or every alert
+# of its lines. Line alerts can concern any stop on the line, which is why they have levels of their own.
+ALERTS_OFF: Final = "off"
+ALERTS_STOP: Final = "stop"
+ALERTS_SERVICE_CHANGES: Final = "service_changes"
+ALERTS_ALL: Final = "all"
+ALERT_LEVELS: Final = [ALERTS_OFF, ALERTS_STOP, ALERTS_SERVICE_CHANGES, ALERTS_ALL]
+DEFAULT_ALERTS: Final = ALERTS_SERVICE_CHANGES
 
 # Vehicles report about once a second; the sensor is rewritten at most this often.
 MIN_UPDATE_SECONDS: Final = 5

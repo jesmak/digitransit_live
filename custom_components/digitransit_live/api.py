@@ -34,12 +34,28 @@ query RegionStops($feeds: [String!]) {
 }
 """
 
+# The stop's own service alerts and each departure's line alerts come with the departures, in every language they have;
+# which ones are shown is decided locally.
 STOP_DEPARTURES = """
+fragment AlertFields on Alert {
+  alertHeaderText
+  alertHeaderTextTranslations {
+    language
+    text
+  }
+  alertEffect
+  effectiveStartDate
+  effectiveEndDate
+}
+
 query StopDepartures($id: String!, $count: Int!) {
   stop(id: $id) {
     gtfsId
     name
     code
+    alerts(types: [STOP]) {
+      ...AlertFields
+    }
     stoptimesWithoutPatterns(numberOfDepartures: $count, omitNonPickups: true) {
       scheduledDeparture
       realtimeDeparture
@@ -60,6 +76,9 @@ query StopDepartures($id: String!, $count: Int!) {
           longName
           mode
           color
+          alerts(types: [ROUTE]) {
+            ...AlertFields
+          }
         }
         arrivalStoptime {
           stopPosition

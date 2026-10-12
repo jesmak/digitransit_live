@@ -136,13 +136,15 @@
             "stop": "Stop",
             "departures": "Number of departures",
             "lines": "Lines",
-            "update_seconds": "Update interval"
+            "update_seconds": "Update interval",
+            "alerts": "Service alerts"
           },
           "data_description": {
             "stop": "Stops often come in pairs, on opposite sides of the street.",
             "departures": "The sensor's state is the next departure; the rest are in its attributes.",
             "lines": "Line numbers such as 4 or 8A. Leave empty for every line.",
-            "update_seconds": "How often departures are fetched, at least every 30 seconds."
+            "update_seconds": "How often departures are fetched, at least every 30 seconds.",
+            "alerts": "Line alerts can concern any stop on the line. Service changes are detours, cancelled or reduced service and delays."
           }
         },
         "reconfigure": {
@@ -151,12 +153,14 @@
           "data": {
             "departures": "Number of departures",
             "lines": "Lines",
-            "update_seconds": "Update interval"
+            "update_seconds": "Update interval",
+            "alerts": "Service alerts"
           },
           "data_description": {
             "departures": "The sensor's state is the next departure; the rest are in its attributes.",
             "lines": "Line numbers such as 4 or 8A. Leave empty for every line.",
-            "update_seconds": "How often departures are fetched, at least every 30 seconds."
+            "update_seconds": "How often departures are fetched, at least every 30 seconds.",
+            "alerts": "Line alerts can concern any stop on the line. Service changes are detours, cancelled or reduced service and delays."
           }
         }
       },
@@ -179,6 +183,14 @@
         "fi": "Suomi",
         "sv": "Svenska",
         "en": "English"
+      }
+    },
+    "alerts": {
+      "options": {
+        "off": "Off",
+        "stop": "The stop's own",
+        "service_changes": "The stop's own and service changes on its lines",
+        "all": "The stop's own and every alert on its lines"
       }
     }
   }

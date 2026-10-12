@@ -85,13 +85,28 @@ city centre: move the pin close to your stop and select **Next**. Last, choose y
 pin, nearest first with their distances, set the options below and select **Submit**. If your stop isn't listed, the
 last choice in the list takes you back to the map.
 
-| Name                 | Type    | Description                                            | Default    |
-| -------------------- | ------- | ------------------------------------------------------ | ---------- |
-| Number of departures | number  | How many departures the sensor lists, 1–20             | 5          |
-| Lines                | list    | Line numbers such as `4` or `8A`. Empty for every line | every line |
-| Update interval      | seconds | How often departures are fetched, at least 30          | 60         |
+| Name                 | Type    | Description                                            | Default                    |
+| -------------------- | ------- | ------------------------------------------------------ | -------------------------- |
+| Number of departures | number  | How many departures the sensor lists, 1–20             | 5                          |
+| Lines                | list    | Line numbers such as `4` or `8A`. Empty for every line | every line                 |
+| Update interval      | seconds | How often departures are fetched, at least 30          | 60                         |
+| Service alerts       | choice  | Which of Digitransit's service alerts to show, below   | own and service changes    |
 
 Changing a stop changes only these settings. To follow another stop, add it and remove the old one.
+
+Service alerts come in two kinds. A stop's own alerts concern that stop: it's closed, moved or served differently.
+Line alerts concern a whole line, and nothing in them says which of its stops they're about, so a line alert can be
+about a stop at the other end of town. Some regions, such as Föli in Turku, publish almost everything as line alerts,
+stop moves included. The choices:
+
+| Choice                                          | Shows                                                                                                       |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Off                                             | No alerts                                                                                                   |
+| The stop's own                                  | The stop's own alerts                                                                                       |
+| The stop's own and service changes on its lines | Also line alerts that change the trip: detours, no or reduced service, modified service, significant delays |
+| The stop's own and every alert on its lines     | Also every other line alert, such as a stop moved elsewhere on the line                                     |
+
+Stops added before 1.1.0 use the default until changed.
 
 ## Sensors
 
@@ -128,6 +143,7 @@ follow the [departures format](https://github.com/jesmak/departures-card/blob/ma
 | `stop_name`          | The stop's name                                  |
 | `stop_code`          | The code shown at the stop, e.g. `H0453`         |
 | `departures`         | The next departures, soonest first               |
+| `notices`            | The stop's own service alerts in force now       |
 | `attribution`        | Data credit                                      |
 
 Each departure has:
@@ -144,9 +160,11 @@ Each departure has:
 | `delay`     | Seconds late; negative when early                                    |
 | `platform`  | Platform or track, when the stop has one                             |
 | `cancelled` | `true` when the trip is cancelled                                    |
+| `notice`    | The line's service alerts in force now, joined with ` · `            |
 | `color`     | The line's own colour, when the region gives one                     |
 
-Keys with no value are left out. Cancelled trips stay in the list, marked `cancelled`, so you know not to wait for them.
+Alerts are shown in the integration's language when Digitransit has them in it, and otherwise in the region's own
+language, usually Finnish. Only an alert's headline is used, from its start to its end. Keys with no value are left out. Cancelled trips stay in the list, marked `cancelled`, so you know not to wait for them.
 Arrivals at a line's last stop are left out, since nobody can board them. Only the next departure time is stored in the
 recorder, not the list. If Digitransit refuses the API key, the sensors become unavailable and Home Assistant asks for
 a new key on the integration page.

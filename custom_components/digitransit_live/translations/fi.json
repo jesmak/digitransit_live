@@ -136,13 +136,15 @@
             "stop": "Pysäkki",
             "departures": "Lähtöjen määrä",
             "lines": "Linjat",
-            "update_seconds": "Päivitysväli"
+            "update_seconds": "Päivitysväli",
+            "alerts": "Häiriötiedotteet"
           },
           "data_description": {
             "stop": "Pysäkit ovat usein pareittain kadun eri puolilla.",
             "departures": "Sensorin tila on seuraava lähtö, muut ovat sen attribuuteissa.",
             "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
-            "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein."
+            "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein.",
+            "alerts": "Linjan tiedote voi koskea mitä tahansa linjan pysäkkiä. Liikennemuutoksia ovat poikkeusreitit, peruttu tai harvennettu liikenne ja viivästykset."
           }
         },
         "reconfigure": {
@@ -151,12 +153,14 @@
           "data": {
             "departures": "Lähtöjen määrä",
             "lines": "Linjat",
-            "update_seconds": "Päivitysväli"
+            "update_seconds": "Päivitysväli",
+            "alerts": "Häiriötiedotteet"
           },
           "data_description": {
             "departures": "Sensorin tila on seuraava lähtö, muut ovat sen attribuuteissa.",
             "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
-            "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein."
+            "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein.",
+            "alerts": "Linjan tiedote voi koskea mitä tahansa linjan pysäkkiä. Liikennemuutoksia ovat poikkeusreitit, peruttu tai harvennettu liikenne ja viivästykset."
           }
         }
       },
@@ -179,6 +183,14 @@
         "fi": "Suomi",
         "sv": "Svenska",
         "en": "English"
+      }
+    },
+    "alerts": {
+      "options": {
+        "off": "Ei mitään",
+        "stop": "Pysäkin omat",
+        "service_changes": "Pysäkin omat ja sen linjojen liikennemuutokset",
+        "all": "Pysäkin omat ja kaikki sen linjojen tiedotteet"
       }
     }
   }

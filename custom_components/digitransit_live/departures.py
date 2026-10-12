@@ -8,13 +8,25 @@ import re
 import statistics
 from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from typing import Any
 
 from homeassistant.util import dt as dt_util
 
-from .const import CONF_DEPARTURES, CONF_LINES, CONF_ROUTER, CONF_STOP, DEFAULT_DEPARTURES, REGION_NAMES
+from .const import (
+    ALERTS_ALL,
+    ALERTS_OFF,
+    ALERTS_SERVICE_CHANGES,
+    CONF_ALERTS,
+    CONF_DEPARTURES,
+    CONF_LINES,
+    CONF_ROUTER,
+    CONF_STOP,
+    DEFAULT_ALERTS,
+    DEFAULT_DEPARTURES,
+    REGION_NAMES,
+)
 
 # With a line filter, more departures are fetched so that enough of the chosen lines remain. Without one, twice as many:
 # at a line's last stop up to half of them are arrivals, which are dropped.
@@ -26,6 +38,12 @@ MODES = {"BUS": "bus", "TRAM": "tram", "SUBWAY": "metro", "RAIL": "train", "FERR
 HEX_COLOR = re.compile(r"^[0-9a-fA-F]{6}$")
 # Languages that write decimals with a comma.
 DECIMAL_COMMA_LANGUAGES = frozenset({"fi", "sv"})
+# Line alerts that change the trip itself, as opposed to a stop moved elsewhere on the line or a note about tickets.
+SERVICE_CHANGE_EFFECTS = frozenset(
+    {"DETOUR", "NO_SERVICE", "REDUCED_SERVICE", "MODIFIED_SERVICE", "SIGNIFICANT_DELAYS"}
+)
+# An alert's text when it has none in the chosen language. Some regions (Föli) tag their Finnish with no language.
+ALERT_FALLBACK_LANGUAGES = ("", "fi", "en", "sv")
 
 # A region's centre is found by counting its stops in squares of this size.
 DENSITY_SQUARE_KM = 0.5
@@ -40,6 +58,7 @@ class DeparturesConfig:
     count: int
     # Upper-case line numbers; empty for every line.
     lines: frozenset[str]
+    alerts: str
 
     @classmethod
     def from_data(cls, data: Mapping[str, Any]) -> DeparturesConfig:
@@ -48,6 +67,7 @@ class DeparturesConfig:
             stop_id=str(data[CONF_STOP]),
             count=int(data.get(CONF_DEPARTURES, DEFAULT_DEPARTURES)),
             lines=frozenset(str(line).strip().upper() for line in data.get(CONF_LINES) or ()),
+            alerts=str(data.get(CONF_ALERTS, DEFAULT_ALERTS)),
         )
 
     @property
@@ -69,6 +89,8 @@ class Departure:
     platform: str | None
     cancelled: bool
     color: str | None
+    # The line's service alerts in force, joined into one text.
+    notice: str | None = None
 
     def as_attribute(self) -> dict[str, Any]:
         """The departure in the departures format; fields with no value are left out."""
@@ -83,6 +105,7 @@ class Departure:
             "delay": self.delay_seconds,
             "platform": self.platform,
             "cancelled": self.cancelled or None,
+            "notice": self.notice,
             "color": self.color,
         }
         return {key: value for key, value in attribute.items() if value is not None}
@@ -94,6 +117,8 @@ class StopDepartures:
     name: str
     code: str | None
     departures: list[Departure]
+    # The stop's own service alerts in force.
+    notices: list[str]
 
     @property
     def next_departure(self) -> Departure | None:
@@ -101,13 +126,21 @@ class StopDepartures:
         return next((departure for departure in self.departures if not departure.cancelled), None)
 
 
-def parse_departures(stop: Mapping[str, Any], config: DeparturesConfig) -> StopDepartures:
-    """The stop's next departures in order, limited to the chosen lines and count. Cancelled ones stay in the list."""
+def parse_departures(stop: Mapping[str, Any], config: DeparturesConfig, language: str, now: datetime) -> StopDepartures:
+    """The stop's next departures in order, limited to the chosen lines and count. Cancelled ones stay in the list.
+
+    The stop's own alerts and its lines' alerts are included as the config's alerts level says.
+    """
     departures = []
     for stoptime in stop.get("stoptimesWithoutPatterns") or []:
         departure = parse_departure(stoptime)
         if departure is None or (config.lines and departure.line.upper() not in config.lines):
             continue
+        if config.alerts in (ALERTS_SERVICE_CHANGES, ALERTS_ALL):
+            route_alerts = ((stoptime.get("trip") or {}).get("route") or {}).get("alerts")
+            effects = None if config.alerts == ALERTS_ALL else SERVICE_CHANGE_EFFECTS
+            if texts := alert_texts(route_alerts, language, now, effects):
+                departure = replace(departure, notice=" · ".join(texts))
         departures.append(departure)
     departures.sort(key=lambda departure: departure.estimated)
     return StopDepartures(
@@ -115,6 +148,7 @@ def parse_departures(stop: Mapping[str, Any], config: DeparturesConfig) -> StopD
         name=str(stop.get("name") or ""),
         code=stop.get("code"),
         departures=departures[: config.count],
+        notices=[] if config.alerts == ALERTS_OFF else alert_texts(stop.get("alerts"), language, now),
     )
 
 
@@ -150,6 +184,41 @@ def parse_departure(stoptime: Mapping[str, Any]) -> Departure | None:
         cancelled=stoptime.get("realtimeState") == "CANCELED",
         color=f"#{color.lower()}" if isinstance(color, str) and HEX_COLOR.match(color) else None,
     )
+
+
+def alert_texts(
+    alerts: Iterable[Mapping[str, Any] | None] | None,
+    language: str,
+    now: datetime,
+    effects: frozenset[str] | None = None,
+) -> list[str]:
+    """The headers of the alerts in force now, in the chosen language when there is one, without duplicates.
+
+    The routing API also returns alerts that haven't started yet. With effects, only alerts with one of them count.
+    """
+    timestamp = now.timestamp()
+    texts: list[str] = []
+    for alert in alerts or []:
+        if not alert or (effects is not None and alert.get("alertEffect") not in effects):
+            continue
+        start, end = alert.get("effectiveStartDate"), alert.get("effectiveEndDate")
+        if (is_number(start) and timestamp < start) or (is_number(end) and timestamp > end):
+            continue
+        if (text := alert_text(alert, language)) and text not in texts:
+            texts.append(text)
+    return texts
+
+
+def alert_text(alert: Mapping[str, Any], language: str) -> str | None:
+    translations = {
+        str(translation.get("language") or ""): str(translation["text"]).strip()
+        for translation in alert.get("alertHeaderTextTranslations") or []
+        if translation and translation.get("text")
+    }
+    for candidate in (language, *ALERT_FALLBACK_LANGUAGES):
+        if translations.get(candidate):
+            return translations[candidate]
+    return str(alert.get("alertHeaderText") or "").strip() or None
 
 
 def is_int(value: Any) -> bool:

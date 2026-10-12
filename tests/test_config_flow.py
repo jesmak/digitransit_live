@@ -186,8 +186,9 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
     assert labels[-1] == "Siirrä merkkiä nähdäksesi muita pysäkkejä"
     assert len(labels) == 9
     assert suggested(result, "stop") is None, "no stop is chosen in advance"
+    assert suggested(result, "alerts") == "service_changes"
 
-    settings = {"departures": 3.0, "lines": [" 16 ", "4", "16", ""], "update_seconds": 60.0}
+    settings = {"departures": 3.0, "lines": [" 16 ", "4", "16", ""], "update_seconds": 60.0, "alerts": "stop"}
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], {"stop": "move_pin"} | settings)
     assert result["step_id"] == "location"
     assert suggested(result, "location") == {"latitude": 60.1702, "longitude": 24.941}, "the pin stays where it was"
@@ -196,7 +197,7 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], {"location": moved})
     assert result["step_id"] == "stop"
     assert result["data_schema"].schema["stop"].config["options"][0]["label"] == "Malmi (H2400) – 0 m, bus"
-    assert suggested(result, "departures") == 3.0, "settings are kept"
+    assert (suggested(result, "departures"), suggested(result, "alerts")) == (3.0, "stop"), "settings are kept"
     assert len(routing_api.mock_calls) == requests, "moving the pin doesn't ask Digitransit"
 
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], {"stop": "HSL:1020453"} | settings)
@@ -211,6 +212,7 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
         "departures": 3,
         "lines": ["16", "4"],
         "update_seconds": 60,
+        "alerts": "stop",
     }
     state = hass.states.get("sensor.kauppatori_h0453")
     assert state.state == "2026-09-15T09:01:30+00:00"
@@ -222,9 +224,10 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
 
     # Changing it keeps the stop.
     result = await entry.start_subentry_reconfigure_flow(hass, subentry.subentry_id)
-    assert [str(key) for key in result["data_schema"].schema] == ["departures", "lines", "update_seconds"]
+    assert [str(key) for key in result["data_schema"].schema] == ["departures", "lines", "update_seconds", "alerts"]
+    assert suggested(result, "alerts") == "stop"
     result = await hass.config_entries.subentries.async_configure(
-        result["flow_id"], {"departures": 1.0, "update_seconds": 120.0}
+        result["flow_id"], {"departures": 1.0, "update_seconds": 120.0, "alerts": "off"}
     )
     assert result["reason"] == "reconfigure_successful"
     await hass.async_block_till_done()
@@ -234,6 +237,7 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
         "departures": 1,
         "lines": [],
         "update_seconds": 120,
+        "alerts": "off",
     }
 
 
