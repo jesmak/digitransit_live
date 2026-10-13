@@ -37,7 +37,7 @@ MAX_FETCH = 100
 MODES = {"BUS": "bus", "TRAM": "tram", "SUBWAY": "metro", "RAIL": "train", "FERRY": "ferry"}
 HEX_COLOR = re.compile(r"^[0-9a-fA-F]{6}$")
 # Languages that write decimals with a comma.
-DECIMAL_COMMA_LANGUAGES = frozenset({"fi", "sv"})
+DECIMAL_COMMA_LANGUAGES = frozenset({"fi"})
 # Line alerts that change the trip itself, as opposed to a stop moved elsewhere on the line or a note about tickets.
 SERVICE_CHANGE_EFFECTS = frozenset(
     {"DETOUR", "NO_SERVICE", "REDUCED_SERVICE", "MODIFIED_SERVICE", "SIGNIFICANT_DELAYS"}
@@ -300,7 +300,7 @@ def nearest_stops(
 
 
 def format_distance(metres: float, language: str) -> str:
-    """ "130 m", or "1,3 km" in Finnish and Swedish and "1.3 km" in English."""
+    """ "130 m", or "1,3 km" in Finnish and "1.3 km" in English."""
     if metres < 1000:
         return f"{round(metres)} m"
     kilometres = f"{metres / 1000:.1f}"

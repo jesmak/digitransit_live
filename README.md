@@ -55,7 +55,7 @@ estimates from Digitransit's routing API. They need a free Digitransit API key; 
 
 | Name     | Type     | Description                                                   | Default                   |
 | -------- | -------- | ------------------------------------------------------------- | ------------------------- |
-| language | enum     | Language of the texts written into feeds: `fi`, `sv` or `en`  | Home Assistant's language |
+| language | enum     | Language of the texts written into feeds: `fi` or `en`  | Home Assistant's language |
 | API key  | password | Digitransit subscription key, needed only for stop departures | none                      |
 
 Get an API key by registering at [portal-api.digitransit.fi](https://portal-api.digitransit.fi/) and subscribing to

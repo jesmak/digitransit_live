@@ -193,13 +193,13 @@ def test_alert_language_falls_back() -> None:
         "gtfsId": "HSL:1",
         "name": "X",
         "alerts": [
-            alert("Oletus", fi="Suomeksi", sv="På svenska"),
-            alert("Oletus", blank="Ilman kieltä", sv="Utan språk på finska"),
+            alert("Oletus", fi="Suomeksi", en="In English"),
+            alert("Oletus", blank="Ilman kieltä", en="Also in English"),
             alert("Vain oletus"),
         ],
     }
-    assert parse_departures(stop, config(), "sv", NOW).notices == ["På svenska", "Utan språk på finska", "Vain oletus"]
-    assert parse_departures(stop, config(), "en", NOW).notices == ["Suomeksi", "Ilman kieltä", "Vain oletus"]
+    assert parse_departures(stop, config(), "en", NOW).notices == ["In English", "Also in English", "Vain oletus"]
+    assert parse_departures(stop, config(), "fi", NOW).notices == ["Suomeksi", "Ilman kieltä", "Vain oletus"]
 
 
 def test_the_nearest_stops_come_first() -> None:

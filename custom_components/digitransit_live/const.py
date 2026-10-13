@@ -12,7 +12,7 @@ MAP_FEED_VERSION: Final = 1
 DEPARTURES_VERSION: Final = 1
 
 # Languages for the texts the integration writes into feeds. Each needs a texts/<code>.json file.
-LANGUAGES: Final = ["fi", "sv", "en"]
+LANGUAGES: Final = ["fi", "en"]
 
 MQTT_HOST: Final = "mqtt.digitransit.fi"
 MQTT_PORT: Final = 8883

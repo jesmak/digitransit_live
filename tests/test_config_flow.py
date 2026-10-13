@@ -128,10 +128,10 @@ async def test_an_entered_api_key_is_checked(hass: HomeAssistant, aioclient_mock
 async def test_the_api_key_can_be_removed(hass: HomeAssistant) -> None:
     entry = await setup_entry(hass, api_key="old")
     result = await entry.start_reconfigure_flow(hass)
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"language": "sv"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"language": "en"})
     assert result["reason"] == "reconfigure_successful"
     await hass.async_block_till_done()
-    assert entry.data == {"language": "sv"}
+    assert entry.data == {"language": "en"}
 
 
 async def test_reauthentication_saves_a_new_key(hass: HomeAssistant, routing_api: AiohttpClientMocker) -> None:
