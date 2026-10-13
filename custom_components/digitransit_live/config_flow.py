@@ -184,9 +184,7 @@ class VehicleFeedFlow(ConfigSubentryFlow):
     async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
         return self._step_feed("reconfigure", user_input, self._get_reconfigure_subentry())
 
-    def _step_feed(
-        self, step_id: str, user_input: dict[str, Any] | None, current: ConfigSubentry | None
-    ) -> SubentryFlowResult:
+    def _step_feed(self, step_id: str, user_input: dict[str, Any] | None, current: ConfigSubentry | None) -> SubentryFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             data = dict(user_input)
@@ -234,18 +232,14 @@ def feed_schema() -> vol.Schema:
             vol.Required(CONF_FEED): SelectSelector(
                 SelectSelectorConfig(options=feeds, mode=SelectSelectorMode.DROPDOWN, custom_value=True)
             ),
-            vol.Optional(CONF_LINES): SelectSelector(
-                SelectSelectorConfig(options=[], multiple=True, custom_value=True)
-            ),
+            vol.Optional(CONF_LINES): SelectSelector(SelectSelectorConfig(options=[], multiple=True, custom_value=True)),
             vol.Required(CONF_USE_AREA): BooleanSelector(),
             vol.Optional(CONF_AREA): LocationSelector(LocationSelectorConfig(radius=True, icon="mdi:bus")),
             vol.Required(CONF_MAX_AGE_MINUTES): NumberSelector(
                 NumberSelectorConfig(min=1, max=60, step=1, unit_of_measurement="min", mode=NumberSelectorMode.BOX)
             ),
             vol.Required(CONF_UPDATE_SECONDS): NumberSelector(
-                NumberSelectorConfig(
-                    min=MIN_UPDATE_SECONDS, max=3600, step=1, unit_of_measurement="s", mode=NumberSelectorMode.BOX
-                )
+                NumberSelectorConfig(min=MIN_UPDATE_SECONDS, max=3600, step=1, unit_of_measurement="s", mode=NumberSelectorMode.BOX)
             ),
         }
     )
@@ -282,14 +276,10 @@ DEPARTURE_DEFAULTS: dict[str, Any] = {
 
 def departure_fields() -> dict[vol.Marker, Any]:
     return {
-        vol.Required(CONF_DEPARTURES): NumberSelector(
-            NumberSelectorConfig(min=1, max=MAX_DEPARTURES, step=1, mode=NumberSelectorMode.BOX)
-        ),
+        vol.Required(CONF_DEPARTURES): NumberSelector(NumberSelectorConfig(min=1, max=MAX_DEPARTURES, step=1, mode=NumberSelectorMode.BOX)),
         vol.Optional(CONF_LINES): SelectSelector(SelectSelectorConfig(options=[], multiple=True, custom_value=True)),
         vol.Required(CONF_UPDATE_SECONDS): NumberSelector(
-            NumberSelectorConfig(
-                min=MIN_DEPARTURE_UPDATE_SECONDS, max=3600, step=1, unit_of_measurement="s", mode=NumberSelectorMode.BOX
-            )
+            NumberSelectorConfig(min=MIN_DEPARTURE_UPDATE_SECONDS, max=3600, step=1, unit_of_measurement="s", mode=NumberSelectorMode.BOX)
         ),
         vol.Required(CONF_ALERTS): SelectSelector(
             SelectSelectorConfig(options=ALERT_LEVELS, translation_key=CONF_ALERTS, mode=SelectSelectorMode.DROPDOWN)
@@ -360,11 +350,7 @@ class DeparturesFlow(ConfigSubentryFlow):
 
         options = [SelectOptionDict(value=value, label=label) for value, label in region_options(self._regions)]
         schema = vol.Schema(
-            {
-                vol.Required(CONF_REGION): SelectSelector(
-                    SelectSelectorConfig(options=options, mode=SelectSelectorMode.DROPDOWN, sort=False)
-                )
-            }
+            {vol.Required(CONF_REGION): SelectSelector(SelectSelectorConfig(options=options, mode=SelectSelectorMode.DROPDOWN, sort=False))}
         )
         return self.async_show_form(
             step_id="user",
@@ -381,9 +367,7 @@ class DeparturesFlow(ConfigSubentryFlow):
             location = user_input[CONF_LOCATION]
             self._location = {"latitude": float(location["latitude"]), "longitude": float(location["longitude"])}
             return await self.async_step_stop()
-        schema = vol.Schema(
-            {vol.Required(CONF_LOCATION): LocationSelector(LocationSelectorConfig(radius=False, icon="mdi:bus-stop"))}
-        )
+        schema = vol.Schema({vol.Required(CONF_LOCATION): LocationSelector(LocationSelectorConfig(radius=False, icon="mdi:bus-stop"))})
         return self.async_show_form(
             step_id="location",
             data_schema=self.add_suggested_values_to_schema(schema, {CONF_LOCATION: self._location}),
@@ -400,9 +384,7 @@ class DeparturesFlow(ConfigSubentryFlow):
 
         if user_input is not None:
             self._settings = {
-                key: user_input[key]
-                for key in (CONF_DEPARTURES, CONF_LINES, CONF_UPDATE_SECONDS, CONF_ALERTS)
-                if key in user_input
+                key: user_input[key] for key in (CONF_DEPARTURES, CONF_LINES, CONF_UPDATE_SECONDS, CONF_ALERTS) if key in user_input
             }
             stop_id = str(user_input[CONF_STOP])
             if stop_id in listed:
@@ -418,9 +400,7 @@ class DeparturesFlow(ConfigSubentryFlow):
         options.append(SelectOptionDict(value=MOVE_PIN, label=texts("move_pin")))
         schema = vol.Schema(
             {
-                vol.Required(CONF_STOP): SelectSelector(
-                    SelectSelectorConfig(options=options, mode=SelectSelectorMode.LIST, sort=False)
-                ),
+                vol.Required(CONF_STOP): SelectSelector(SelectSelectorConfig(options=options, mode=SelectSelectorMode.LIST, sort=False)),
                 **departure_fields(),
             }
         )
@@ -434,13 +414,9 @@ class DeparturesFlow(ConfigSubentryFlow):
     async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
         subentry = self._get_reconfigure_subentry()
         if user_input is not None:
-            return self.async_update_and_abort(
-                self._get_entry(), subentry, data={**subentry.data, **departure_settings(user_input)}
-            )
+            return self.async_update_and_abort(self._get_entry(), subentry, data={**subentry.data, **departure_settings(user_input)})
         return self.async_show_form(
             step_id="reconfigure",
-            data_schema=self.add_suggested_values_to_schema(
-                vol.Schema(departure_fields()), {**DEPARTURE_DEFAULTS, **subentry.data}
-            ),
+            data_schema=self.add_suggested_values_to_schema(vol.Schema(departure_fields()), {**DEPARTURE_DEFAULTS, **subentry.data}),
             description_placeholders={"stop": subentry.title},
         )

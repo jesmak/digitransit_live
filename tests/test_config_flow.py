@@ -32,9 +32,7 @@ async def setup_entry(hass: HomeAssistant, **data: str) -> MockConfigEntry:
 
 
 async def add_feed(hass: HomeAssistant, entry: MockConfigEntry, values: dict) -> dict:
-    result = await hass.config_entries.subentries.async_init(
-        (entry.entry_id, "vehicles"), context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.subentries.async_init((entry.entry_id, "vehicles"), context={"source": SOURCE_USER})
     assert result["type"] is FlowResultType.FORM
     return await hass.config_entries.subentries.async_configure(result["flow_id"], values)
 
@@ -95,9 +93,7 @@ async def test_reconfiguring_a_feed(hass: HomeAssistant, fake_mqtt: type[FakeMqt
     )
     assert result["type"] is FlowResultType.FORM
 
-    result = await hass.config_entries.subentries.async_configure(
-        result["flow_id"], FEED | {"feed": "tampere", "use_area": True}
-    )
+    result = await hass.config_entries.subentries.async_configure(result["flow_id"], FEED | {"feed": "tampere", "use_area": True})
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
     await hass.async_block_till_done()
@@ -156,9 +152,7 @@ def suggested(result: dict, field: str) -> object:
 async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpClientMocker) -> None:
     entry = await setup_entry(hass, api_key="test-key")
 
-    result = await hass.config_entries.subentries.async_init(
-        (entry.entry_id, "departures"), context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.subentries.async_init((entry.entry_id, "departures"), context={"source": SOURCE_USER})
     assert (result["step_id"], result["last_step"]) == ("user", False)
     assert result["data_schema"].schema["region"].config["options"] == [
         {"value": "HSL", "label": "Helsinki region (HSL)"},
@@ -243,9 +237,7 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
 
 async def test_stop_departures_need_an_api_key(hass: HomeAssistant) -> None:
     entry = await setup_entry(hass)
-    result = await hass.config_entries.subentries.async_init(
-        (entry.entry_id, "departures"), context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.subentries.async_init((entry.entry_id, "departures"), context={"source": SOURCE_USER})
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "api_key_missing"
 
@@ -255,14 +247,10 @@ async def test_a_region_without_stops(hass: HomeAssistant, aioclient_mock: Aioht
 
     async def answer(method: str, url: object, data: dict) -> AiohttpClientMockResponse:
         empty = "RegionStops" in data["query"]
-        return AiohttpClientMockResponse(
-            method, url, json={"data": {"stopsByBbox": []} if empty else {"feeds": [{"feedId": "Tyhjä"}]}}
-        )
+        return AiohttpClientMockResponse(method, url, json={"data": {"stopsByBbox": []} if empty else {"feeds": [{"feedId": "Tyhjä"}]}})
 
     aioclient_mock.post(ROUTING_API.format(router="finland"), side_effect=answer)
-    result = await hass.config_entries.subentries.async_init(
-        (entry.entry_id, "departures"), context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.subentries.async_init((entry.entry_id, "departures"), context={"source": SOURCE_USER})
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], {"region": "Tyhjä"})
     assert result["step_id"] == "user"
     assert result["errors"] == {"region": "no_stops"}
@@ -271,8 +259,6 @@ async def test_a_region_without_stops(hass: HomeAssistant, aioclient_mock: Aioht
 async def test_a_refused_key_stops_adding_a_stop(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
     entry = await setup_entry(hass, api_key="expired")
     aioclient_mock.post(ROUTING_API.format(router="finland"), status=401)
-    result = await hass.config_entries.subentries.async_init(
-        (entry.entry_id, "departures"), context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.subentries.async_init((entry.entry_id, "departures"), context={"source": SOURCE_USER})
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "invalid_api_key"

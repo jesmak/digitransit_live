@@ -17,10 +17,7 @@ from custom_components.digitransit_live.vehicles import (
 
 from .conftest import LAPPEENRANTA_AREA, vehicle_message
 
-REAL_TOPIC = (
-    "/gtfsrt/vp/Lappeenranta///BUS/4/0/Mäntylä/Ma-Pe_talvi_2026-2027_4_0_090000_093500_0/205275/09:00/90220/"
-    "61;28/01/47/74/4//"
-)
+REAL_TOPIC = "/gtfsrt/vp/Lappeenranta///BUS/4/0/Mäntylä/Ma-Pe_talvi_2026-2027_4_0_090000_093500_0/205275/09:00/90220/61;28/01/47/74/4//"
 
 
 def config(**overrides) -> VehicleFeedConfig:

@@ -129,8 +129,7 @@ def alert(text: str, effect: str = "OTHER_EFFECT", *, start: int = -3600, end: i
     return {
         "alertHeaderText": text,
         "alertHeaderTextTranslations": [
-            {"language": "" if language == "blank" else language, "text": value}
-            for language, value in translations.items()
+            {"language": "" if language == "blank" else language, "text": value} for language, value in translations.items()
         ],
         "alertEffect": effect,
         "effectiveStartDate": int(NOW.timestamp()) + start,

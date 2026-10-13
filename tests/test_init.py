@@ -146,9 +146,7 @@ def departures_entry(hass: HomeAssistant, **data: str) -> MockConfigEntry:
     return entry
 
 
-async def test_departures_sensor(
-    hass: HomeAssistant, routing_api: AiohttpClientMocker, fake_mqtt: type[FakeMqtt]
-) -> None:
+async def test_departures_sensor(hass: HomeAssistant, routing_api: AiohttpClientMocker, fake_mqtt: type[FakeMqtt]) -> None:
     entry = departures_entry(hass, api_key="test-key")
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()

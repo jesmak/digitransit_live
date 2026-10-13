@@ -151,9 +151,7 @@ class VehicleStore:
     def recent(self, max_age_seconds: float, now: float) -> list[VehicleReport]:
         """Reports received within `max_age_seconds`, by line and vehicle."""
         for vehicle_id in [
-            vehicle_id
-            for vehicle_id, report in self._reports.items()
-            if now - report.received_at > STORE_RETENTION_SECONDS
+            vehicle_id for vehicle_id, report in self._reports.items() if now - report.received_at > STORE_RETENTION_SECONDS
         ]:
             del self._reports[vehicle_id]
         return sorted(
@@ -180,9 +178,7 @@ class VehicleFeedConfig:
         )
 
 
-def build_vehicle_features(
-    reports: list[VehicleReport], config: VehicleFeedConfig, texts: Texts
-) -> list[dict[str, Any]]:
+def build_vehicle_features(reports: list[VehicleReport], config: VehicleFeedConfig, texts: Texts) -> list[dict[str, Any]]:
     features = []
     for report in reports:
         if config.lines and report.line.upper() not in config.lines:

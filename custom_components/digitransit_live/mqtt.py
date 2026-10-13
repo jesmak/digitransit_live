@@ -59,9 +59,7 @@ class DigitransitMqtt:
 
     # ---------------- paho callbacks, in paho's network thread ----------------
 
-    def _handle_connect(
-        self, client: mqtt.Client, userdata: Any, flags: Any, reason_code: Any, properties: Any
-    ) -> None:
+    def _handle_connect(self, client: mqtt.Client, userdata: Any, flags: Any, reason_code: Any, properties: Any) -> None:
         if reason_code.is_failure:
             _LOGGER.warning("Connecting to %s failed: %s", self._host, reason_code)
             return
@@ -69,9 +67,7 @@ class DigitransitMqtt:
         client.subscribe([(topic, 0) for topic in self._topics])
         self._call_in_loop(self._set_connected, True)
 
-    def _handle_disconnect(
-        self, client: mqtt.Client, userdata: Any, flags: Any, reason_code: Any, properties: Any
-    ) -> None:
+    def _handle_disconnect(self, client: mqtt.Client, userdata: Any, flags: Any, reason_code: Any, properties: Any) -> None:
         self._call_in_loop(self._set_connected, False)
 
     def _handle_message(self, client: mqtt.Client, userdata: Any, message: mqtt.MQTTMessage) -> None:

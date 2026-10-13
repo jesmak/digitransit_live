@@ -77,9 +77,7 @@ ROUTERS = ["hsl", "waltti", "varely", "finland"]
 REGIONS = [{"feedId": "Lappeenranta"}, {"feedId": "HSL"}]
 
 
-def region_stop(
-    gtfs_id: str, name: str, code: str | None, desc: str | None, mode: str, lat: float, lon: float
-) -> dict[str, Any]:
+def region_stop(gtfs_id: str, name: str, code: str | None, desc: str | None, mode: str, lat: float, lon: float) -> dict[str, Any]:
     return {"gtfsId": gtfs_id, "name": name, "code": code, "desc": desc, "vehicleMode": mode, "lat": lat, "lon": lon}
 
 

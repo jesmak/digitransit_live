@@ -39,9 +39,7 @@ HEX_COLOR = re.compile(r"^[0-9a-fA-F]{6}$")
 # Languages that write decimals with a comma.
 DECIMAL_COMMA_LANGUAGES = frozenset({"fi"})
 # Line alerts that change the trip itself, as opposed to a stop moved elsewhere on the line or a note about tickets.
-SERVICE_CHANGE_EFFECTS = frozenset(
-    {"DETOUR", "NO_SERVICE", "REDUCED_SERVICE", "MODIFIED_SERVICE", "SIGNIFICANT_DELAYS"}
-)
+SERVICE_CHANGE_EFFECTS = frozenset({"DETOUR", "NO_SERVICE", "REDUCED_SERVICE", "MODIFIED_SERVICE", "SIGNIFICANT_DELAYS"})
 # An alert's text when it has none in the chosen language. Some regions (Föli) tag their Finnish with no language.
 ALERT_FALLBACK_LANGUAGES = ("", "fi", "en", "sv")
 
@@ -287,9 +285,7 @@ def distance_m(latitude: float, longitude: float, other_latitude: float, other_l
     return 2 * EARTH_RADIUS_M * math.asin(math.sqrt(half_chord))
 
 
-def nearest_stops(
-    stops: Iterable[Mapping[str, Any] | None] | None, latitude: float, longitude: float, count: int
-) -> list[dict[str, Any]]:
+def nearest_stops(stops: Iterable[Mapping[str, Any] | None] | None, latitude: float, longitude: float, count: int) -> list[dict[str, Any]]:
     """The stops nearest a point, nearest first, each with its straight-line `distance` in metres."""
     located = [
         {**stop, "distance": distance_m(latitude, longitude, stop["lat"], stop["lon"])}
