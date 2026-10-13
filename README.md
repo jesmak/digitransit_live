@@ -2,17 +2,10 @@
 
 Home Assistant integration that turns Digitransit's live buses, trams and stop departures into map feeds and sensors.
 
-[![GitHub Release][releases-shield]][releases] [![GitHub Release Date][release-date-shield]][releases]
+[![GitHub Release][releases-shield]][releases] [![GitHub Release Date][release-date-shield]][releases] [![HACS][hacs-shield]][hacs] [![License][license-shield]](LICENSE)
 
-[![HACS][hacs-shield]][hacs] [![Home Assistant][home-assistant-shield]][home-assistant] [![License][license-shield]](LICENSE)
-
-![Project Maintenance][maintenance-shield] [![GitHub Activity][commits-shield]][commits] [![Open bugs][bugs-shield]][bugs] [![Open enhancements][enhancements-shield]][enhancements]
-
-## Support
-
-Hey dude! Help me out for a couple of :beers: or a :coffee:!
-
-[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/jesmak)
+<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-light.png#gh-light-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams labelled with their lines and destinations, and the departures from two stops, one of them with a notice about the stop moving">
+<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-dark.png#gh-dark-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams labelled with their lines and destinations, and the departures from two stops, one of them with a notice about the stop moving">
 
 ## What is it?
 
@@ -78,6 +71,9 @@ Add with **Add vehicle feed** on the integration page. Every feed creates one se
 Large regions have hundreds of vehicles. Limit big feeds with lines or an area, so the sensor stays small.
 
 ### Stop departures
+
+<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/stop-departures-light.png#gh-light-mode-only" width="510" alt="A stop departures sensor on departures-card, the next tram large with its countdown and delay, and the departures after it">
+<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/stop-departures-dark.png#gh-dark-mode-only" width="510" alt="A stop departures sensor on departures-card, the next tram large with its countdown and delay, and the departures after it">
 
 Add with **Add stop departures**. It takes three steps. First pick a region: a city's public transport, the Helsinki
 region (HSL) or one of the wider areas. Then a map opens with a pin where the region's stops are densest, usually the
@@ -169,7 +165,29 @@ Arrivals at a line's last stop are left out, since nobody can board them. Only t
 recorder, not the list. If Digitransit refuses the API key, the sensors become unavailable and Home Assistant asks for
 a new key on the integration page.
 
-#### Dashboard card
+## Examples
+
+### Buses and trams on a map
+
+The map is drawn by [ha-map-card](https://github.com/nathan-gs/ha-map-card) and the
+[map feed plugin](https://github.com/jesmak/ha-map-card-plugin-map-feed), whose README has more options.
+
+```yaml
+type: custom:map-card
+x: 61.4985
+y: 23.765
+zoom: 14
+plugins:
+  - name: Buses and trams
+    hacs:
+      module: ha-map-card-plugin-map-feed
+      file: ha-map-card-plugin-map-feed.js
+    options:
+      entity: sensor.tampere_buses_and_trams
+      labels: 14
+```
+
+### Stop departures
 
 [departures-card](https://github.com/jesmak/departures-card) shows the departures: the next one large with a
 countdown, the ones after it below, and several stops in one card, such as both sides of a street.
@@ -177,10 +195,23 @@ countdown, the ones after it below, and several stops in one card, such as both 
 ```yaml
 type: custom:departures-card
 entities:
-  - sensor.kauppatori_h0453
+  - entity: sensor.keskustori_tke0001
+    subtitle: towards Hervanta
+  - sensor.hameenkatu_tke0002
 ```
 
-## How it works
+## Upgrading from 1.1
+
+Nothing is required. Swedish is no longer one of the integration's languages. An integration set to Swedish writes
+its feed texts in English, and choosing Finnish or English in its settings makes that explicit. Feeds, stops, entity
+IDs and attributes carry over.
+
+## Data
+
+The public transport data comes from [Digitransit](https://digitransit.fi/) and the regional transport authorities,
+licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+### How it is fetched
 
 One MQTT connection to `mqtt.digitransit.fi` (TLS, port 8883) serves every feed. For each region it subscribes to
 `/gtfsrt/vp/<feed id>/#`: one GTFS Realtime vehicle position per message, with the line number and destination in the
@@ -194,10 +225,13 @@ stops, a few megabytes. The pin starts where the stops are densest: they're coun
 busiest block of squares wins. The stops nearest the pin are worked out in Home Assistant, so moving the pin needs no
 requests.
 
-## Data
+## Translating
 
-Public transport data: [Digitransit](https://digitransit.fi/) and the regional transport authorities, licensed under
-[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+The integration's own texts are in two places. `translations/<language>.json` has Home Assistant's UI, and
+`texts/<language>.json` the texts written into feeds. To add a language, copy both `en.json` files to the new
+language's code, translate the values, and add the code to `LANGUAGES` in `const.py`. The tests check that every
+language has the same keys and placeholders as English. Stop names, destinations and service alerts come from
+Digitransit as they are.
 
 ## Development
 
@@ -223,23 +257,21 @@ python3.14 -m venv .venv
 | `feed.py`, `geo.py`                 | Map Feed format building blocks and the area                        |
 | `texts.py`, `texts/<language>.json` | Texts written into feeds                                            |
 | `translations/<language>.json`      | Home Assistant UI texts                                             |
+| `docs/screenshots.json`             | The made-up data the README's screenshots are taken from            |
 
-To add a language, copy `texts/en.json` and `translations/en.json` to `<code>.json`, translate the values, and add
-the code to `LANGUAGES` in `const.py`. The tests check that every language has the same keys and placeholders as
-English.
+## Support
+
+Hey dude! Help me out for a couple of :beers: or a :coffee:!
+
+[![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/jesmak)
+
+## License
+
+MIT, see [LICENSE](LICENSE).
 
 [releases-shield]: https://img.shields.io/github/release/jesmak/digitransit_live.svg?style=for-the-badge
 [release-date-shield]: https://img.shields.io/github/release-date/jesmak/digitransit_live?style=for-the-badge
 [releases]: https://github.com/jesmak/digitransit_live/releases
 [hacs-shield]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
 [hacs]: https://hacs.xyz/docs/faq/custom_repositories/
-[home-assistant-shield]: https://img.shields.io/badge/Home%20Assistant-UI%20setup-green.svg?style=for-the-badge
-[home-assistant]: https://www.home-assistant.io/
 [license-shield]: https://img.shields.io/github/license/jesmak/digitransit_live.svg?style=for-the-badge
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2026.svg?style=for-the-badge
-[commits-shield]: https://img.shields.io/github/commit-activity/y/jesmak/digitransit_live.svg?style=for-the-badge
-[commits]: https://github.com/jesmak/digitransit_live/commits/main
-[bugs-shield]: https://img.shields.io/github/issues/jesmak/digitransit_live/bug?style=for-the-badge&label=bugs&color=red
-[bugs]: https://github.com/jesmak/digitransit_live/labels/bug
-[enhancements-shield]: https://img.shields.io/github/issues/jesmak/digitransit_live/enhancement?style=for-the-badge&label=enhancements&color=blue
-[enhancements]: https://github.com/jesmak/digitransit_live/labels/enhancement

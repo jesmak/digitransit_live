@@ -1,0 +1,435 @@
+{
+    "resources": [
+        "../../hass-kortit/departures-card/dist/departures-card.js",
+        "https://github.com/nathan-gs/ha-map-card/releases/download/v1.16.0/map-card.js"
+    ],
+    "files": [
+        "../../hass-kortit/ha-map-card-plugin-map-feed/dist/ha-map-card-plugin-map-feed.js"
+    ],
+    "clock": "2026-10-14T07:40:00+03:00",
+    "states": {
+        "sensor.tampere_buses_and_trams": {
+            "state": "10",
+            "attributes": {
+                "friendly_name": "Tampere buses and trams",
+                "map_feed_version": 1,
+                "attribution": "Digitransit, CC BY 4.0",
+                "updated": "2026-10-14T07:39:56+03:00",
+                "geojson": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/101",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7461,
+                                    61.4978
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 1",
+                                "kind": "tram",
+                                "updated": "2026-10-14T07:39:52+03:00",
+                                "heading": 95,
+                                "stationary": false,
+                                "speed_kmh": 28.4,
+                                "badge": "1",
+                                "label": "Hervanta",
+                                "subtitle": "Hervanta",
+                                "color": "#da2128"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/102",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7886,
+                                    61.4994
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 1",
+                                "kind": "tram",
+                                "updated": "2026-10-14T07:39:50+03:00",
+                                "heading": 265,
+                                "stationary": false,
+                                "speed_kmh": 24.1,
+                                "badge": "1",
+                                "label": "Pyynikintori",
+                                "subtitle": "Pyynikintori",
+                                "color": "#da2128"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/103",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7664,
+                                    61.4978
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 3",
+                                "kind": "tram",
+                                "updated": "2026-10-14T07:39:55+03:00",
+                                "heading": 95,
+                                "stationary": false,
+                                "speed_kmh": 31.0,
+                                "badge": "3",
+                                "label": "Hervanta",
+                                "subtitle": "Hervanta",
+                                "color": "#da2128"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/104",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7735,
+                                    61.4982
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 3",
+                                "kind": "tram",
+                                "updated": "2026-10-14T07:39:48+03:00",
+                                "heading": 275,
+                                "stationary": true,
+                                "speed_kmh": 0.0,
+                                "badge": "3",
+                                "label": "Lentävänniemi",
+                                "subtitle": "Lentävänniemi",
+                                "color": "#da2128"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/201",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7856,
+                                    61.5054
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 8",
+                                "kind": "bus",
+                                "updated": "2026-10-14T07:39:51+03:00",
+                                "heading": 60,
+                                "stationary": false,
+                                "speed_kmh": 36.2,
+                                "badge": "8",
+                                "label": "Atala",
+                                "subtitle": "Atala",
+                                "color": "#1b57a7"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/202",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7522,
+                                    61.493
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 8",
+                                "kind": "bus",
+                                "updated": "2026-10-14T07:39:53+03:00",
+                                "heading": 200,
+                                "stationary": false,
+                                "speed_kmh": 22.5,
+                                "badge": "8",
+                                "label": "Linnainmaa",
+                                "subtitle": "Linnainmaa",
+                                "color": "#1b57a7"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/203",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7911,
+                                    61.4954
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 25",
+                                "kind": "bus",
+                                "updated": "2026-10-14T07:39:49+03:00",
+                                "heading": 140,
+                                "stationary": false,
+                                "speed_kmh": 41.0,
+                                "badge": "25",
+                                "label": "Kaukajärvi",
+                                "subtitle": "Kaukajärvi",
+                                "color": "#1b57a7"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/204",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7406,
+                                    61.4995
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 2",
+                                "kind": "bus",
+                                "updated": "2026-10-14T07:39:54+03:00",
+                                "heading": 330,
+                                "stationary": false,
+                                "speed_kmh": 18.9,
+                                "badge": "2",
+                                "label": "Rahola",
+                                "subtitle": "Rahola",
+                                "color": "#1b57a7"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/205",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7806,
+                                    61.4953
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 13",
+                                "kind": "bus",
+                                "updated": "2026-10-14T07:39:47+03:00",
+                                "heading": 85,
+                                "stationary": true,
+                                "speed_kmh": 0.0,
+                                "badge": "13",
+                                "label": "Hervanta",
+                                "subtitle": "Hervanta",
+                                "color": "#1b57a7"
+                            }
+                        },
+                        {
+                            "type": "Feature",
+                            "id": "vehicle:tampere/206",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [
+                                    23.7565,
+                                    61.4914
+                                ]
+                            },
+                            "properties": {
+                                "name": "Line 17",
+                                "kind": "bus",
+                                "updated": "2026-10-14T07:39:56+03:00",
+                                "heading": 250,
+                                "stationary": false,
+                                "speed_kmh": 33.7,
+                                "badge": "17",
+                                "label": "Pirkkala",
+                                "subtitle": "Pirkkala",
+                                "color": "#1b57a7"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "sensor.keskustori_tke0001": {
+            "state": "2026-10-14T07:42:00+03:00",
+            "attributes": {
+                "friendly_name": "Keskustori",
+                "device_class": "timestamp",
+                "departures_version": 1,
+                "stop_name": "Keskustori",
+                "stop_code": "0001",
+                "attribution": "Digitransit, CC BY 4.0",
+                "departures": [
+                    {
+                        "id": "trip:example:3_0741",
+                        "line": "3",
+                        "mode": "bus",
+                        "headsign": "Hervanta",
+                        "scheduled": "2026-10-14T07:41:00+03:00",
+                        "estimated": "2026-10-14T07:42:00+03:00",
+                        "realtime": true,
+                        "delay": 60,
+                        "color": "#1b57a7"
+                    },
+                    {
+                        "id": "trip:example:1_0746",
+                        "line": "1",
+                        "mode": "tram",
+                        "headsign": "Pyynikintori",
+                        "scheduled": "2026-10-14T07:46:00+03:00",
+                        "estimated": "2026-10-14T07:46:00+03:00",
+                        "realtime": true,
+                        "color": "#da2128"
+                    },
+                    {
+                        "id": "trip:example:8_0750",
+                        "line": "8",
+                        "mode": "bus",
+                        "headsign": "Atala",
+                        "scheduled": "2026-10-14T07:50:00+03:00",
+                        "estimated": "2026-10-14T07:53:00+03:00",
+                        "realtime": true,
+                        "delay": 180,
+                        "color": "#1b57a7"
+                    },
+                    {
+                        "id": "trip:example:25_0812",
+                        "line": "25",
+                        "mode": "bus",
+                        "headsign": "Kaukajärvi",
+                        "scheduled": "2026-10-14T08:52:00+03:00",
+                        "estimated": "2026-10-14T08:52:00+03:00",
+                        "color": "#1b57a7"
+                    }
+                ]
+            }
+        },
+        "sensor.hameenkatu_tke0002": {
+            "state": "2026-10-14T07:44:00+03:00",
+            "attributes": {
+                "friendly_name": "Hämeenkatu",
+                "device_class": "timestamp",
+                "departures_version": 1,
+                "stop_name": "Hämeenkatu",
+                "stop_code": "0002",
+                "attribution": "Digitransit, CC BY 4.0",
+                "notices": [
+                    "The stop moves 50 m east during street works until 31 October."
+                ],
+                "departures": [
+                    {
+                        "id": "trip:example:2_0744",
+                        "line": "2",
+                        "mode": "bus",
+                        "headsign": "Rauhaniemi",
+                        "scheduled": "2026-10-14T07:44:00+03:00",
+                        "estimated": "2026-10-14T07:44:00+03:00",
+                        "realtime": true,
+                        "notice": "Diverted via Satakunnankatu because of street works",
+                        "color": "#1b57a7"
+                    },
+                    {
+                        "id": "trip:example:2_0754",
+                        "line": "2",
+                        "mode": "bus",
+                        "headsign": "Rauhaniemi",
+                        "scheduled": "2026-10-14T07:54:00+03:00",
+                        "estimated": "2026-10-14T07:55:00+03:00",
+                        "realtime": true,
+                        "delay": 60,
+                        "notice": "Diverted via Satakunnankatu because of street works",
+                        "color": "#1b57a7"
+                    },
+                    {
+                        "id": "trip:example:12_0758",
+                        "line": "12",
+                        "mode": "bus",
+                        "headsign": "Lamminpää",
+                        "scheduled": "2026-10-14T07:58:00+03:00",
+                        "estimated": "2026-10-14T07:58:00+03:00",
+                        "color": "#1b57a7"
+                    },
+                    {
+                        "id": "trip:example:1_0801",
+                        "line": "1",
+                        "mode": "tram",
+                        "headsign": "Hervantajärvi",
+                        "scheduled": "2026-10-14T08:01:00+03:00",
+                        "estimated": "2026-10-14T08:01:00+03:00",
+                        "realtime": true,
+                        "color": "#da2128"
+                    }
+                ]
+            }
+        }
+    },
+    "shots": [
+        {
+            "name": "dashboard",
+            "width": 1280,
+            "view": {
+                "type": "sections",
+                "max_columns": 3,
+                "sections": [
+                    {
+                        "type": "grid",
+                        "column_span": 2,
+                        "cards": [
+                            {
+                                "type": "custom:map-card",
+                                "x": 61.4985,
+                                "y": 23.765,
+                                "zoom": 14,
+                                "map_options": {
+                                    "zoomControl": false
+                                },
+                                "plugins": [
+                                    {
+                                        "name": "Buses and trams",
+                                        "url": "/local/ha-map-card-plugin-map-feed.js",
+                                        "options": {
+                                            "entity": "sensor.tampere_buses_and_trams",
+                                            "labels": 14
+                                        }
+                                    }
+                                ],
+                                "grid_options": {
+                                    "columns": "full",
+                                    "rows": 9
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "type": "grid",
+                        "cards": [
+                            {
+                                "type": "custom:departures-card",
+                                "entities": [
+                                    {
+                                        "entity": "sensor.keskustori_tke0001",
+                                        "subtitle": "towards Hervanta"
+                                    },
+                                    "sensor.hameenkatu_tke0002"
+                                ],
+                                "departures": 3
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "stop-departures",
+            "width": 500,
+            "card": {
+                "type": "custom:departures-card",
+                "entities": [
+                    "sensor.keskustori_tke0001"
+                ]
+            }
+        }
+    ]
+}
