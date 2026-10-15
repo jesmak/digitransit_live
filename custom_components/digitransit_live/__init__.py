@@ -15,13 +15,25 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import RoutingClient
-from .const import CONF_API_KEY, CONF_FEED, CONF_LANGUAGE, SUBENTRY_DEPARTURES, SUBENTRY_VEHICLES
+from .const import CONF_API_KEY, CONF_FEED, CONF_LANGUAGE, LANGUAGES, SUBENTRY_DEPARTURES, SUBENTRY_VEHICLES
 from .coordinator import DeparturesCoordinator, DigitransitConfigEntry, DigitransitRuntimeData, VehicleFeedCoordinator
 from .mqtt import DigitransitMqtt
 from .texts import async_load_texts
 from .vehicles import VehicleReport, VehicleStore
 
 PLATFORMS = [Platform.SENSOR]
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: DigitransitConfigEntry) -> bool:
+    if entry.version > 1:
+        return False
+    if entry.minor_version < 2:
+        # Swedish was dropped in 1.2. An entry still set to it is switched to English, which it already wrote mostly.
+        data = dict(entry.data)
+        if data.get(CONF_LANGUAGE) not in LANGUAGES:
+            data[CONF_LANGUAGE] = "en"
+        hass.config_entries.async_update_entry(entry, data=data, minor_version=2)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: DigitransitConfigEntry) -> bool:

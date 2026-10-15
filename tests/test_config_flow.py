@@ -75,6 +75,9 @@ async def test_feed_validation(hass: HomeAssistant) -> None:
     result = await add_feed(hass, entry, FEED | {"feed": "Lappeenranta/#"})
     assert result["errors"] == {"feed": "invalid_feed"}
 
+    result = await add_feed(hass, entry, FEED | {"name": "   "})
+    assert result["errors"] == {"name": "name_required"}
+
     result = await add_feed(hass, entry, FEED | {"lines": ["4", "8 A"]})
     assert result["errors"] == {"lines": "invalid_line"}
 
@@ -121,6 +124,14 @@ async def test_an_entered_api_key_is_checked(hass: HomeAssistant, aioclient_mock
     assert aioclient_mock.mock_calls[-1][3] == {"digitransit-subscription-key": "right"}
 
 
+async def test_an_unchanged_key_is_not_checked_again(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+    entry = await setup_entry(hass, api_key="old")
+    result = await entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"language": "en", "api_key": "old"})
+    assert result["reason"] == "reconfigure_successful"
+    assert aioclient_mock.call_count == 0, "the language changes while Digitransit is down"
+
+
 async def test_the_api_key_can_be_removed(hass: HomeAssistant) -> None:
     entry = await setup_entry(hass, api_key="old")
     result = await entry.start_reconfigure_flow(hass)
@@ -155,14 +166,14 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
     result = await hass.config_entries.subentries.async_init((entry.entry_id, "departures"), context={"source": SOURCE_USER})
     assert (result["step_id"], result["last_step"]) == ("user", False)
     assert result["data_schema"].schema["region"].config["options"] == [
-        {"value": "HSL", "label": "Helsinki region (HSL)"},
+        {"value": "HSL", "label": "Helsingin seutu (HSL)"},
         {"value": "Lappeenranta", "label": "Lappeenranta"},
     ]
 
     # Picking a region fetches its stops and shows the map, pinned at their densest spot.
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], {"region": "HSL"})
     assert (result["step_id"], result["last_step"]) == ("location", False)
-    assert result["description_placeholders"] == {"region": "Helsinki region (HSL)"}
+    assert result["description_placeholders"] == {"region": "Helsingin seutu (HSL)"}
     assert suggested(result, "location") == {"latitude": 60.1702, "longitude": 24.941}
     requests = len(routing_api.mock_calls)
 
@@ -173,9 +184,9 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
     assert (result["step_id"], result["last_step"]) == ("stop", True)
     labels = [option["label"] for option in result["data_schema"].schema["stop"].config["options"]]
     assert labels[:3] == [
-        "Ylioppilastalo (H0103) – 28 m, bus",
-        "Kauppatori (H0201) – Eteläranta, 33 m, tram",
-        "Kauppatori (H0453) – Pohjoisesplanadi, 60 m, bus",
+        "Ylioppilastalo (H0103) – 28 m, bussi",
+        "Kauppatori (H0201) – Eteläranta, 33 m, raitiovaunu",
+        "Kauppatori (H0453) – Pohjoisesplanadi, 60 m, bussi",
     ]
     assert labels[-1] == "Siirrä merkkiä nähdäksesi muita pysäkkejä"
     assert len(labels) == 9
@@ -190,7 +201,7 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
     moved = {"latitude": 60.21, "longitude": 25.05}
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], {"location": moved})
     assert result["step_id"] == "stop"
-    assert result["data_schema"].schema["stop"].config["options"][0]["label"] == "Malmi (H2400) – 0 m, bus"
+    assert result["data_schema"].schema["stop"].config["options"][0]["label"] == "Malmi (H2400) – 0 m, bussi"
     assert (suggested(result, "departures"), suggested(result, "alerts")) == (3.0, "stop"), "settings are kept"
     assert len(routing_api.mock_calls) == requests, "moving the pin doesn't ask Digitransit"
 

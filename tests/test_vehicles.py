@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 import time
+from types import SimpleNamespace
+from unittest.mock import MagicMock
 
+import pytest
+
+from custom_components.digitransit_live import mqtt
 from custom_components.digitransit_live.geo import Area
 from custom_components.digitransit_live.texts import load_texts
 from custom_components.digitransit_live.vehicles import (
@@ -118,3 +124,35 @@ def test_line_and_area_filters() -> None:
 
     nearby = build_vehicle_features(reports, config(area=Area.from_selector(LAPPEENRANTA_AREA)), texts)
     assert [feature["id"] for feature in nearby] == ["vehicle:Lappeenranta/1", "vehicle:Lappeenranta/2"]
+
+
+def test_times_after_midnight_and_values_that_are_not_numbers() -> None:
+    report = decode_report(*vehicle_message(start_time="24:10", bearing=float("nan"), speed=float("inf")), 0)
+    assert report.start_time == "00:10", "GTFS counts on from 24.00 after midnight"
+    assert report.bearing is None and report.speed_mps is None
+    assert decode_report(*vehicle_message(latitude=float("nan")), 0) is None
+
+
+def test_trains_are_called_by_their_own_names() -> None:
+    texts = load_texts("fi")
+    intercity = decode_report(*vehicle_message(mode="RAIL", line="IC 29", headsign="Oulu"), 0)
+    commuter = decode_report(*vehicle_message(mode="RAIL", line="R", headsign="Riihimäki"), 0)
+    [long_distance, local] = build_vehicle_features([intercity, commuter], config(), texts)
+    assert (long_distance["properties"]["name"], long_distance["properties"]["kind"]) == ("IC 29 → Oulu", "train.long_distance")
+    assert (local["properties"]["name"], local["properties"]["kind"]) == ("R → Riihimäki", "train.commuter")
+
+
+def test_a_message_that_cannot_be_read_does_not_stop_the_connection(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    def broken(*args: object) -> None:
+        raise ValueError("unexpected")
+
+    client = mqtt.DigitransitMqtt(MagicMock(), ["Lappeenranta"], lambda report: None)
+    monkeypatch.setattr(mqtt, "decode_report", broken)
+    message = SimpleNamespace(topic="/gtfsrt/vp/Lappeenranta/x", payload=b"")
+    with caplog.at_level(logging.DEBUG):
+        client._handle_message(None, None, message)
+        client._handle_message(None, None, message)
+    warnings = [record for record in caplog.records if record.levelno == logging.WARNING]
+    assert len(warnings) == 1, "once, not for every message"

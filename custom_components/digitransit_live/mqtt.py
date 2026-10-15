@@ -29,15 +29,12 @@ class DigitransitMqtt:
         loop: asyncio.AbstractEventLoop,
         feed_ids: Iterable[str],
         on_report: Callable[[VehicleReport], None],
-        host: str = MQTT_HOST,
-        port: int = MQTT_PORT,
     ) -> None:
         self.connected = False
         self._loop = loop
         self._topics = sorted({feed_topic(feed_id) for feed_id in feed_ids})
         self._on_report = on_report
-        self._host = host
-        self._port = port
+        self._reading_fails = False
 
         client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=f"{DOMAIN}-{secrets.token_hex(6)}")
         client.tls_set_context(get_default_context())
@@ -49,7 +46,7 @@ class DigitransitMqtt:
 
     def start(self) -> None:
         """Starts connecting in the background. Returns at once; paho keeps reconnecting until stop()."""
-        self._client.connect_async(self._host, self._port, keepalive=60)
+        self._client.connect_async(MQTT_HOST, MQTT_PORT, keepalive=60)
         self._client.loop_start()
 
     def stop(self) -> None:
@@ -61,17 +58,28 @@ class DigitransitMqtt:
 
     def _handle_connect(self, client: mqtt.Client, userdata: Any, flags: Any, reason_code: Any, properties: Any) -> None:
         if reason_code.is_failure:
-            _LOGGER.warning("Connecting to %s failed: %s", self._host, reason_code)
+            _LOGGER.warning("Connecting to %s failed: %s", MQTT_HOST, reason_code)
             return
         # Subscribing on every connect also restores the subscriptions after a reconnect.
         client.subscribe([(topic, 0) for topic in self._topics])
         self._call_in_loop(self._set_connected, True)
 
     def _handle_disconnect(self, client: mqtt.Client, userdata: Any, flags: Any, reason_code: Any, properties: Any) -> None:
+        if reason_code.is_failure:
+            _LOGGER.warning("The connection to %s was lost: %s", MQTT_HOST, reason_code)
         self._call_in_loop(self._set_connected, False)
 
     def _handle_message(self, client: mqtt.Client, userdata: Any, message: mqtt.MQTTMessage) -> None:
-        report = decode_report(message.topic, message.payload, time.monotonic())
+        # An exception here would end paho's network thread for good, with the connection still counted as up.
+        try:
+            report = decode_report(message.topic, message.payload, time.monotonic())
+        except Exception:
+            # Once until messages are read again, as the same fault would repeat for every vehicle every second.
+            log = _LOGGER.debug if self._reading_fails else _LOGGER.warning
+            log("Reading a message on %s failed", message.topic, exc_info=True)
+            self._reading_fails = True
+            return
+        self._reading_fails = False
         if report is not None:
             self._call_in_loop(self._on_report, report)
 
@@ -86,5 +94,5 @@ class DigitransitMqtt:
 
     def _set_connected(self, connected: bool) -> None:
         if connected != self.connected:
-            _LOGGER.info("%s %s", "Connected to" if connected else "Disconnected from", self._host)
+            _LOGGER.info("%s %s", "Connected to" if connected else "Disconnected from", MQTT_HOST)
         self.connected = connected

@@ -94,6 +94,7 @@
         }
       },
       "error": {
+        "name_required": "Nimi ei voi olla tyhjä.",
         "invalid_feed": "Syötteen tunnuksessa voi olla vain kirjaimia, numeroita, - ja _.",
         "invalid_line": "Linjanumerossa ei voi olla välilyöntejä eikä merkkejä /, # tai +.",
         "area_radius": "Aseta säde vetämällä ympyrän reunaa kartalla."

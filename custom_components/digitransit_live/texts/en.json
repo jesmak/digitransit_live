@@ -5,5 +5,16 @@
   "move_pin": "Move the pin to see other stops",
   "line_to": "Line {line} → {headsign}",
   "sort_line": "Line",
-  "vehicles_count": "vehicles"
+  "vehicles_count": "vehicles",
+  "region_digitraffic": "Finland trains",
+  "region_HSL": "Helsinki region (HSL)",
+  "region_MATKA": "matka.fi buses",
+  "region_CAR_FERRIES": "Finferries car ferries",
+  "region_VR_bussit": "VR buses",
+  "region_Viro": "Estonia",
+  "mode_bus": "bus",
+  "mode_tram": "tram",
+  "mode_rail": "train",
+  "mode_subway": "metro",
+  "mode_ferry": "ferry"
 }

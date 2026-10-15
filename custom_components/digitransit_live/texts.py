@@ -31,6 +31,10 @@ class Texts:
         self._texts = texts
         self._fallback = fallback
 
+    def get(self, key: str) -> str | None:
+        """The text, or None when neither the language nor the fallback has it."""
+        return self._texts.get(key) or self._fallback.get(key)
+
     def __call__(self, key: str, **values: object) -> str:
         text = self._texts.get(key) or self._fallback.get(key) or key
         return PLACEHOLDER.sub(lambda match: str(values.get(match.group(1), "")), text)

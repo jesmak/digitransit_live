@@ -44,10 +44,10 @@ estimates from Digitransit's routing API. They need a free Digitransit API key; 
 
 ### Integration
 
-| Name     | Type     | Description                                                   | Default                   |
-| -------- | -------- | ------------------------------------------------------------- | ------------------------- |
-| language | enum     | Language of the texts written into feeds: `fi` or `en`  | Home Assistant's language |
-| API key  | password | Digitransit subscription key, needed only for stop departures | none                      |
+| Name     | Type     | Description                                                   | Default                                                   |
+| -------- | -------- | ------------------------------------------------------------- | --------------------------------------------------------- |
+| language | enum     | Language of the texts written into feeds, `fi` or `en`        | Home Assistant's language if it is one of them, else `en` |
+| API key  | password | Digitransit subscription key, needed only for stop departures | none                                                      |
 
 Get an API key by registering at [portal-api.digitransit.fi](https://portal-api.digitransit.fi/) and subscribing to
 the routing API. The key is checked when you save it.
@@ -120,10 +120,13 @@ The state is the number of vehicles in the feed. The attributes follow the
 | `list`             | The card's list sorts the vehicles by line    |
 
 Each vehicle is named by its line and destination ("Line 4 → Mäntylä"), with its line number as the badge and its
-destination as the label beside it. It has its heading, speed, trip departure time and vehicle id.
+destination as the label beside it. A train is named by its own name instead ("IC 29 → Oulu"), and one with a number
+in its name is drawn as a long-distance train. Each vehicle has its heading, speed, trip departure time and vehicle id.
 
-None of the attributes are stored in the recorder. The sensor is only written when a vehicle has moved, but on a busy
-feed that can be every update interval, so you may want to exclude it from the recorder. The sensor becomes
+None of the attributes are stored in the recorder. Every report carries a new time, so while any vehicle is reporting
+the sensor is written on every update interval, and you may want to exclude it from the recorder. An empty feed, or
+one whose vehicles haven't reported since the last update, isn't written again. The update interval is at least 15
+seconds, as the map feed format allows for live vehicles. The sensor becomes
 unavailable when the broker connection is lost and no vehicle has reported within the maximum position age.
 
 ### Stop departures
@@ -193,11 +196,12 @@ entities:
   - sensor.hameenkatu_tke0002
 ```
 
-## Upgrading from 1.1
+## Upgrading from 1.2
 
-Nothing is required. Swedish is no longer one of the integration's languages. An integration set to Swedish writes
-its feed texts in English, and choosing Finnish or English in its settings makes that explicit. Feeds, stops, entity
-IDs and attributes carry over.
+Nothing is required, unless a template reads a vehicle's `subtitle`. A vehicle's `name` now has its destination in it
+("Line 4 → Mäntylä" instead of "Line 4"), and `subtitle` is gone. The destination is still in `label`. A feed whose
+update interval was set below 15 seconds is updated every 15 seconds. An integration still set to Swedish, which
+1.2 left out of its languages, is switched to English when it starts. Feeds, stops and entity IDs carry over.
 
 ## Data
 

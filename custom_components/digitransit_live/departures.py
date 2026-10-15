@@ -27,6 +27,7 @@ from .const import (
     DEFAULT_DEPARTURES,
     REGION_NAMES,
 )
+from .texts import Texts
 
 # With a line filter, more departures are fetched so that enough of the chosen lines remain. Without one, twice as many:
 # at a line's last stop up to half of them are arrivals, which are dropped.
@@ -131,6 +132,8 @@ def parse_departures(stop: Mapping[str, Any], config: DeparturesConfig, language
     """
     departures = []
     for stoptime in stop.get("stoptimesWithoutPatterns") or []:
+        if not isinstance(stoptime, Mapping):
+            continue
         departure = parse_departure(stoptime)
         if departure is None or (config.lines and departure.line.upper() not in config.lines):
             continue
@@ -162,15 +165,19 @@ def parse_departure(stoptime: Mapping[str, Any]) -> Departure | None:
     if not is_int(service_day) or not is_int(scheduled):
         return None
     trip = stoptime.get("trip") or {}
+    if not trip.get("gtfsId"):
+        return None
+    position = stoptime.get("stopPosition")
     last_position = (trip.get("arrivalStoptime") or {}).get("stopPosition")
-    if is_int(last_position) and stoptime.get("stopPosition") == last_position:
+    if is_int(last_position) and position == last_position:
         return None
     realtime_departure = stoptime.get("realtimeDeparture")
     estimated = realtime_departure if is_int(realtime_departure) else scheduled
     route = trip.get("route") or {}
     color = route.get("color")
     return Departure(
-        id=f"trip:{trip.get('gtfsId')}/{service_day}",
+        # A trip that passes the stop twice, as a loop line can, departs from it at two positions.
+        id=f"trip:{trip['gtfsId']}/{service_day}/{position}" if is_int(position) else f"trip:{trip['gtfsId']}/{service_day}",
         line=str(route.get("shortName") or route.get("longName") or ""),
         headsign=stoptime.get("headsign") or trip.get("tripHeadsign"),
         mode=MODES.get(str(route.get("mode")), "other"),
@@ -233,15 +240,15 @@ def stop_title(stop: Mapping[str, Any]) -> str:
     return f"{name} ({stop['code']})" if stop.get("code") else name
 
 
-def region_label(feed_id: str) -> str:
-    """A region's name with its feed id: "Jyväskylä (LINKKI)"."""
-    name = REGION_NAMES.get(feed_id, feed_id)
+def region_label(feed_id: str, texts: Texts) -> str:
+    """A region's name with its feed id: "Jyväskylä (LINKKI)". Names that aren't proper names are translated."""
+    name = texts.get(f"region_{feed_id}") or REGION_NAMES.get(feed_id, feed_id)
     return name if feed_id in name else f"{name} ({feed_id})"
 
 
-def region_options(feed_ids: Iterable[str]) -> list[tuple[str, str]]:
+def region_options(feed_ids: Iterable[str], texts: Texts) -> list[tuple[str, str]]:
     """(feed id, label) for choosing a region, sorted by label."""
-    return sorted(((feed_id, region_label(feed_id)) for feed_id in feed_ids), key=lambda option: option[1].lower())
+    return sorted(((feed_id, region_label(feed_id, texts)) for feed_id in feed_ids), key=lambda option: option[1].lower())
 
 
 def region_centre(stops: Iterable[Mapping[str, Any] | None] | None) -> tuple[float, float] | None:
@@ -303,7 +310,7 @@ def format_distance(metres: float, language: str) -> str:
     return f"{kilometres.replace('.', ',') if language in DECIMAL_COMMA_LANGUAGES else kilometres} km"
 
 
-def stop_options(stops: Sequence[Mapping[str, Any]], language: str) -> list[tuple[str, str]]:
+def stop_options(stops: Sequence[Mapping[str, Any]], texts: Texts) -> list[tuple[str, str]]:
     """(id, label) for choosing one of the nearest stops: "Kauppatori (H0453) – Pohjoisesplanadi, 130 m, bus"."""
     options = []
     for stop in stops:
@@ -311,8 +318,8 @@ def stop_options(stops: Sequence[Mapping[str, Any]], language: str) -> list[tupl
         modes = [modes] if isinstance(modes, str) else modes
         details = [
             stop.get("desc"),
-            format_distance(stop["distance"], language) if is_number(stop.get("distance")) else None,
-            ", ".join(str(mode).lower() for mode in modes),
+            format_distance(stop["distance"], texts.language) if is_number(stop.get("distance")) else None,
+            ", ".join(texts.get(f"mode_{str(mode).lower()}") or str(mode).lower() for mode in modes),
         ]
         details_text = ", ".join(detail for detail in details if detail)
         options.append((str(stop["gtfsId"]), stop_title(stop) + (f" – {details_text}" if details_text else "")))

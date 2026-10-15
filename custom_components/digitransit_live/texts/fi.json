@@ -5,5 +5,16 @@
   "move_pin": "Siirrä merkkiä nähdäksesi muita pysäkkejä",
   "line_to": "Linja {line} → {headsign}",
   "sort_line": "Linja",
-  "vehicles_count": "ajoneuvoa"
+  "vehicles_count": "ajoneuvoa",
+  "region_digitraffic": "Suomen junat",
+  "region_HSL": "Helsingin seutu (HSL)",
+  "region_MATKA": "matka.fi-bussit",
+  "region_CAR_FERRIES": "Finferriesin autolautat",
+  "region_VR_bussit": "VR:n bussit",
+  "region_Viro": "Viro",
+  "mode_bus": "bussi",
+  "mode_tram": "raitiovaunu",
+  "mode_rail": "juna",
+  "mode_subway": "metro",
+  "mode_ferry": "lautta"
 }

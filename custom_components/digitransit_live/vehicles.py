@@ -13,6 +13,7 @@ See https://digitransit.fi/en/developers/apis/5-realtime-api/vehicle-positions/d
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -44,6 +45,8 @@ STATIONARY_SPEED_MPS = 0.5
 STORE_RETENTION_SECONDS = 3600
 
 HEX_COLOR = re.compile(r"^[0-9a-fA-F]{6}$")
+# A long-distance train's short name is letters and a number ("IC 29", "PYO 274"); a commuter train's is a letter.
+LONG_DISTANCE_TRAIN = re.compile(r"^[A-Z]+ ?\d+$")
 
 
 def feed_topic(feed_id: str) -> str:
@@ -117,6 +120,8 @@ def decode_report(topic: str, payload: bytes, received_at: float) -> VehicleRepo
             continue
         vehicle = entity.vehicle
         position = vehicle.position
+        if not (math.isfinite(position.latitude) and math.isfinite(position.longitude)):
+            continue
         if position.latitude == 0 and position.longitude == 0:
             continue
         return VehicleReport(
@@ -127,14 +132,22 @@ def decode_report(topic: str, payload: bytes, received_at: float) -> VehicleRepo
             mode=info.mode.upper(),
             line=info.short_name or info.route_id or vehicle.trip.route_id,
             headsign=info.headsign,
-            start_time=info.start_time or vehicle.trip.start_time[:5],
+            start_time=wall_clock(info.start_time or vehicle.trip.start_time[:5]),
             color=f"#{info.color.lower()}" if HEX_COLOR.match(info.color) else None,
-            bearing=position.bearing if position.HasField("bearing") else None,
-            speed_mps=position.speed if position.HasField("speed") else None,
+            bearing=position.bearing if position.HasField("bearing") and math.isfinite(position.bearing) else None,
+            speed_mps=position.speed if position.HasField("speed") and math.isfinite(position.speed) else None,
             timestamp=vehicle.timestamp or None,
             received_at=received_at,
         )
     return None
+
+
+def wall_clock(gtfs_time: str) -> str:
+    """ "24:10" → "00:10": GTFS counts a service day's times after midnight on from 24.00."""
+    hours, separator, minutes = gtfs_time.partition(":")
+    if not separator or not hours.isdigit():
+        return gtfs_time
+    return f"{int(hours) % 24:02d}:{minutes}"
 
 
 class VehicleStore:
@@ -187,8 +200,13 @@ def build_vehicle_features(reports: list[VehicleReport], config: VehicleFeedConf
             continue
 
         destination = f"→ {report.headsign}" if report.headsign else None
-        # The line and where it is going, as one title: "Linja 4 → Mäntylä".
-        if report.line and report.headsign:
+        kind = MODE_KINDS.get(report.mode, "other")
+        if report.mode == "RAIL" and LONG_DISTANCE_TRAIN.match(report.line):
+            kind = "train.long_distance"
+        # The line and where it is going, as one title: "Linja 4 → Mäntylä". A train is called by its own name, "IC 29".
+        if report.mode == "RAIL" and report.line:
+            name = f"{report.line} → {report.headsign}" if report.headsign else report.line
+        elif report.line and report.headsign:
             name = texts("line_to", line=report.line, headsign=report.headsign)
         elif report.line:
             name = texts("line", line=report.line)
@@ -206,7 +224,7 @@ def build_vehicle_features(reports: list[VehicleReport], config: VehicleFeedConf
                 report.longitude,
                 {
                     "name": name,
-                    "kind": MODE_KINDS.get(report.mode, "other"),
+                    "kind": kind,
                     "updated": iso_from_epoch_ms(report.timestamp * 1000) if report.timestamp else None,
                     "heading": round(report.bearing) if report.bearing is not None else None,
                     "stationary": report.speed_mps is not None and report.speed_mps < STATIONARY_SPEED_MPS,

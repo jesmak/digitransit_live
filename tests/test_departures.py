@@ -14,6 +14,7 @@ from custom_components.digitransit_live.departures import (
     stop_options,
     stop_title,
 )
+from custom_components.digitransit_live.texts import load_texts
 
 from .conftest import NOON, REGION_STOPS, SERVICE_DAY, STOP, stoptime
 
@@ -34,7 +35,7 @@ def test_departures_are_in_order_without_arrivals() -> None:
     assert tram.estimated == dt_util.utc_from_timestamp(SERVICE_DAY + NOON + 90)
     assert tram.scheduled == dt_util.utc_from_timestamp(SERVICE_DAY + NOON + 120)
     assert bus.as_attribute() == {
-        "id": f"trip:HSL:1016_{NOON + 300}/{SERVICE_DAY}",
+        "id": f"trip:HSL:1016_{NOON + 300}/{SERVICE_DAY}/5",
         "line": "16",
         "mode": "bus",
         "headsign": "Katajanokka",
@@ -209,16 +210,16 @@ def test_the_nearest_stops_come_first() -> None:
         ("HSL:1020453", 60),
     ]
     assert stop_title(stops[1]) == "Kauppatori (H0201)"
-    assert stop_options(stops, "fi") == [
-        ("HSL:1030003", "Ylioppilastalo (H0103) – 28 m, bus"),
-        ("HSL:1020201", "Kauppatori (H0201) – Eteläranta, 33 m, tram"),
-        ("HSL:1020453", "Kauppatori (H0453) – Pohjoisesplanadi, 60 m, bus"),
+    assert stop_options(stops, load_texts("fi")) == [
+        ("HSL:1030003", "Ylioppilastalo (H0103) – 28 m, bussi"),
+        ("HSL:1020201", "Kauppatori (H0201) – Eteläranta, 33 m, raitiovaunu"),
+        ("HSL:1020453", "Kauppatori (H0453) – Pohjoisesplanadi, 60 m, bussi"),
     ]
 
     everything = nearest_stops(REGION_STOPS, 60.1702, 24.941, 10)
     assert len(everything) == 8
-    assert stop_options(everything[-1:], "fi") == [("HSL:2000003", "Vantaa (V1000) – 16,9 km, bus")]
-    assert stop_options(everything[-1:], "en") == [("HSL:2000003", "Vantaa (V1000) – 16.9 km, bus")]
+    assert stop_options(everything[-1:], load_texts("fi")) == [("HSL:2000003", "Vantaa (V1000) – 16,9 km, bussi")]
+    assert stop_options(everything[-1:], load_texts("en")) == [("HSL:2000003", "Vantaa (V1000) – 16.9 km, bus")]
     assert nearest_stops(REGION_STOPS, 60.21, 25.05, 1)[0]["gtfsId"] == "HSL:2000002", "wherever the pin is"
     assert nearest_stops([{"gtfsId": "X:1", "lat": None, "lon": 25.0}], 60.0, 25.0, 5) == []
 
@@ -230,11 +231,13 @@ def test_a_region_centre_is_where_its_stops_are_densest() -> None:
 
 
 def test_regions_are_named() -> None:
-    assert region_label("HSL") == "Helsinki region (HSL)"
-    assert region_label("LINKKI") == "Jyväskylä (LINKKI)"
-    assert region_label("Lappeenranta") == "Lappeenranta"
-    assert region_label("Uusi") == "Uusi"
-    assert region_options(["Lappeenranta", "HSL"]) == [
+    english, finnish = load_texts("en"), load_texts("fi")
+    assert region_label("HSL", english) == "Helsinki region (HSL)"
+    assert region_label("HSL", finnish) == "Helsingin seutu (HSL)"
+    assert region_label("LINKKI", finnish) == "Jyväskylä (LINKKI)"
+    assert region_label("Lappeenranta", finnish) == "Lappeenranta"
+    assert region_label("Uusi", finnish) == "Uusi"
+    assert region_options(["Lappeenranta", "HSL"], english) == [
         ("HSL", "Helsinki region (HSL)"),
         ("Lappeenranta", "Lappeenranta"),
     ]

@@ -73,12 +73,13 @@ from .const import (
     SUBENTRY_VEHICLES,
 )
 from .departures import nearest_stops, region_centre, region_label, region_options, stop_options, stop_title
-from .texts import async_load_texts
+from .texts import Texts, async_load_texts
 
 DEFAULT_RADIUS_M = 10_000
 
-# Feed ids and line numbers become MQTT topic levels or filters: no slashes or wildcards.
+# Feed ids become MQTT topic levels: no slashes or wildcards.
 FEED_ID = re.compile(r"^[A-Za-z0-9_-]+$")
+# Line numbers are compared with the vehicles' and departures' short names, which have no spaces or slashes.
 LINE = re.compile(r"^[^/#+\s]{1,20}$")
 
 API_KEY_SELECTOR = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
@@ -113,6 +114,7 @@ async def check_api_key(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, 
 
 class DigitransitLiveConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
+    MINOR_VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         errors: dict[str, str] = {}
@@ -136,7 +138,9 @@ class DigitransitLiveConfigFlow(ConfigFlow, domain=DOMAIN):
             data = {**entry.data, **user_input}
             if CONF_API_KEY not in user_input:
                 data.pop(CONF_API_KEY, None)
-            errors = await check_api_key(self.hass, data)
+            # A key that didn't change isn't checked again, so the language can be changed while Digitransit is down.
+            if data.get(CONF_API_KEY) != entry.data.get(CONF_API_KEY):
+                errors = await check_api_key(self.hass, data)
             if not errors:
                 # The update listener in __init__.py reloads the entry.
                 self.hass.config_entries.async_update_entry(entry, data=data)
@@ -179,17 +183,19 @@ class VehicleFeedFlow(ConfigSubentryFlow):
     """Adding (step "user") and changing (step "reconfigure") a vehicle feed with a single form."""
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
-        return self._step_feed("user", user_input, None)
+        return await self._step_feed("user", user_input, None)
 
     async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
-        return self._step_feed("reconfigure", user_input, self._get_reconfigure_subentry())
+        return await self._step_feed("reconfigure", user_input, self._get_reconfigure_subentry())
 
-    def _step_feed(self, step_id: str, user_input: dict[str, Any] | None, current: ConfigSubentry | None) -> SubentryFlowResult:
+    async def _step_feed(self, step_id: str, user_input: dict[str, Any] | None, current: ConfigSubentry | None) -> SubentryFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             data = dict(user_input)
             title = data.pop(CONF_NAME).strip()
             errors = validate(data)
+            if not title:
+                errors[CONF_NAME] = "name_required"
             if not errors:
                 data = clean(data)
                 if current is None:
@@ -204,7 +210,7 @@ class VehicleFeedFlow(ConfigSubentryFlow):
             values = self._defaults()
         return self.async_show_form(
             step_id=step_id,
-            data_schema=self.add_suggested_values_to_schema(feed_schema(), values),
+            data_schema=self.add_suggested_values_to_schema(feed_schema(await entry_texts(self)), values),
             errors=errors,
         )
 
@@ -221,9 +227,14 @@ class VehicleFeedFlow(ConfigSubentryFlow):
         }
 
 
-def feed_schema() -> vol.Schema:
+async def entry_texts(flow: ConfigSubentryFlow) -> Texts:
+    """The texts in the language of the entry the subentry belongs to."""
+    return await async_load_texts(flow.hass, flow._get_entry().data.get(CONF_LANGUAGE, "en"))
+
+
+def feed_schema(texts: Texts) -> vol.Schema:
     feeds = sorted(
-        (SelectOptionDict(value=feed_id, label=f"{name} ({feed_id})") for feed_id, name in FEEDS.items()),
+        (SelectOptionDict(value=feed_id, label=f"{texts.get(f'region_{feed_id}') or name} ({feed_id})") for feed_id, name in FEEDS.items()),
         key=lambda option: option["label"],
     )
     return vol.Schema(
@@ -348,7 +359,7 @@ class DeparturesFlow(ConfigSubentryFlow):
                     return await self.async_step_location()
                 errors[CONF_REGION] = "no_stops"
 
-        options = [SelectOptionDict(value=value, label=label) for value, label in region_options(self._regions)]
+        options = [SelectOptionDict(value=value, label=label) for value, label in region_options(self._regions, await entry_texts(self))]
         schema = vol.Schema(
             {vol.Required(CONF_REGION): SelectSelector(SelectSelectorConfig(options=options, mode=SelectSelectorMode.DROPDOWN, sort=False))}
         )
@@ -371,7 +382,7 @@ class DeparturesFlow(ConfigSubentryFlow):
         return self.async_show_form(
             step_id="location",
             data_schema=self.add_suggested_values_to_schema(schema, {CONF_LOCATION: self._location}),
-            description_placeholders={"region": region_label(self._region)},
+            description_placeholders={"region": region_label(self._region, await entry_texts(self))},
             last_step=False,
         )
 
@@ -394,9 +405,8 @@ class DeparturesFlow(ConfigSubentryFlow):
                 )
             return await self.async_step_location()
 
-        language = self._get_entry().data.get(CONF_LANGUAGE, "en")
-        texts = await async_load_texts(self.hass, language)
-        options = [SelectOptionDict(value=value, label=label) for value, label in stop_options(stops, language)]
+        texts = await entry_texts(self)
+        options = [SelectOptionDict(value=value, label=label) for value, label in stop_options(stops, texts)]
         options.append(SelectOptionDict(value=MOVE_PIN, label=texts("move_pin")))
         schema = vol.Schema(
             {
@@ -407,7 +417,7 @@ class DeparturesFlow(ConfigSubentryFlow):
         return self.async_show_form(
             step_id="stop",
             data_schema=self.add_suggested_values_to_schema(schema, {**DEPARTURE_DEFAULTS, **(self._settings or {})}),
-            description_placeholders={"region": region_label(self._region)},
+            description_placeholders={"region": region_label(self._region, await entry_texts(self))},
             last_step=True,
         )
 

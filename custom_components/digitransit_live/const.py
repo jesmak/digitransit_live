@@ -64,8 +64,9 @@ ALERTS_ALL: Final = "all"
 ALERT_LEVELS: Final = [ALERTS_OFF, ALERTS_STOP, ALERTS_SERVICE_CHANGES, ALERTS_ALL]
 DEFAULT_ALERTS: Final = ALERTS_SERVICE_CHANGES
 
-# Vehicles report about once a second; the sensor is rewritten at most this often.
-MIN_UPDATE_SECONDS: Final = 5
+# Vehicles report about once a second; the sensor is rewritten at most this often, the map feed format's limit for
+# live vehicles.
+MIN_UPDATE_SECONDS: Final = 15
 DEFAULT_UPDATE_SECONDS: Final = 15
 # A vehicle that hasn't reported for this long has finished its trip or lost its connection.
 DEFAULT_MAX_AGE_MINUTES: Final = 2

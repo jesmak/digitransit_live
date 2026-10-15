@@ -105,6 +105,15 @@ async def test_feeds_share_one_connection_and_write_map_feeds(hass: HomeAssistan
     assert client.stopped
 
 
+async def test_an_entry_left_on_swedish_is_switched_to_english(hass: HomeAssistant) -> None:
+    entry = MockConfigEntry(domain=DOMAIN, title="Digitransit", data={"language": "sv"}, version=1, minor_version=1)
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    assert entry.data["language"] == "en"
+    assert entry.minor_version == 2
+
+
 async def test_feeds_are_kept_out_of_the_recorder() -> None:
     assert MATCH_ALL in MapFeedSensor._unrecorded_attributes
 
