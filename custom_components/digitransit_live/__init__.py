@@ -2,7 +2,7 @@
 
 One MQTT connection serves every vehicle feed. Each feed is a config subentry
 with its own coordinator and sensor, and the sensor writes the Map Feed format
-that the map feed plugin for ha-map-card draws. Stops are subentries too: their
+that map-feed-card draws. Stops are subentries too: their
 departures are polled from the routing API with the entry's API key.
 """
 

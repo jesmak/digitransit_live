@@ -2,5 +2,8 @@
   "line": "Linja {line}",
   "departure": "Lähtöaika",
   "vehicle": "Ajoneuvo",
-  "move_pin": "Siirrä merkkiä nähdäksesi muita pysäkkejä"
+  "move_pin": "Siirrä merkkiä nähdäksesi muita pysäkkejä",
+  "line_to": "Linja {line} → {headsign}",
+  "sort_line": "Linja",
+  "vehicles_count": "ajoneuvoa"
 }

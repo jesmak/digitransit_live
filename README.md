@@ -12,11 +12,9 @@ Home Assistant integration that turns Digitransit's live buses, trams and stop d
 A custom component that turns live public transport vehicles from [Digitransit](https://digitransit.fi/)'s MQTT
 broker into **map feeds**: one sensor per feed, holding every bus, tram or train in it as GeoJSON.
 
-Show the feeds on a map with [ha-map-card](https://github.com/nathan-gs/ha-map-card) and the
-[map feed plugin](https://github.com/jesmak/ha-map-card-plugin-map-feed), which draws each vehicle with its line
-number, heading and destination. The feed format is documented in
-[map-feed-format.md](https://github.com/jesmak/ha-map-card-plugin-map-feed/blob/main/docs/map-feed-format.md), so
-other integrations can produce feeds for the same card.
+Show the feeds on a map with [map-feed-card](https://github.com/jesmak/map-feed-card), which draws each vehicle with
+its line number and heading, and lists the vehicles by line. The feed format is documented in
+[map-feed-format.md](https://github.com/jesmak/map-feed-card/blob/main/docs/map-feed-format.md), so other integrations can produce feeds for the same card.
 
 Digitransit publishes vehicle positions for many Finnish regions, including Tampere, Turku, Oulu, Jyväskylä, Kuopio,
 Lahti, Lappeenranta, Joensuu, Pori, Vaasa, Kouvola and Kotka. The broker needs no API key. Helsinki region (HSL)
@@ -109,7 +107,7 @@ Stops added before 1.1.0 use the default until changed.
 ### Vehicle feeds
 
 The state is the number of vehicles in the feed. The attributes follow the
-[Map Feed format](https://github.com/jesmak/ha-map-card-plugin-map-feed/blob/main/docs/map-feed-format.md):
+[Map Feed format](https://github.com/jesmak/map-feed-card/blob/main/docs/map-feed-format.md):
 
 | Name               | Description                                   |
 | ------------------ | --------------------------------------------- |
@@ -118,8 +116,11 @@ The state is the number of vehicles in the feed. The attributes follow the
 | `area`             | The feed's area, if it has one                |
 | `updated`          | When the vehicles last changed                |
 | `attribution`      | Data credit                                   |
+| `feed_type`        | Always `transit`                              |
+| `list`             | The card's list sorts the vehicles by line    |
 
-Each vehicle has its line number as the badge, its destination, heading, speed, trip departure time and vehicle id.
+Each vehicle is named by its line and destination ("Line 4 → Mäntylä"), with its line number as the badge and its
+destination as the label beside it. It has its heading, speed, trip departure time and vehicle id.
 
 None of the attributes are stored in the recorder. The sensor is only written when a vehicle has moved, but on a busy
 feed that can be every update interval, so you may want to exclude it from the recorder. The sensor becomes
@@ -169,22 +170,14 @@ a new key on the integration page.
 
 ### Buses and trams on a map
 
-The map is drawn by [ha-map-card](https://github.com/nathan-gs/ha-map-card) and the
-[map feed plugin](https://github.com/jesmak/ha-map-card-plugin-map-feed), whose README has more options.
+The map is drawn by [map-feed-card](https://github.com/jesmak/map-feed-card), whose README has more options.
 
 ```yaml
-type: custom:map-card
-x: 61.4985
-y: 23.765
-zoom: 14
-plugins:
-  - name: Buses and trams
-    hacs:
-      module: ha-map-card-plugin-map-feed
-      file: ha-map-card-plugin-map-feed.js
-    options:
-      entity: sensor.tampere_buses_and_trams
-      labels: 14
+type: custom:map-feed-card
+list: true
+entities:
+  - entity: sensor.tampere_buses_and_trams
+    labels: true
 ```
 
 ### Stop departures

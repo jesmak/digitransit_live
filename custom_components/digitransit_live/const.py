@@ -6,7 +6,7 @@ DOMAIN: Final = "digitransit_live"
 
 ATTRIBUTION: Final = "Digitransit, CC BY 4.0"
 
-# Version of the Map Feed format the sensors write (docs/map-feed-format.md in ha-map-card-plugin-map-feed).
+# Version of the Map Feed format the sensors write (docs/map-feed-format.md in map-feed-card).
 MAP_FEED_VERSION: Final = 1
 # Version of the departures format the departure sensors write (docs/departures-format.md in departures-card).
 DEPARTURES_VERSION: Final = 1

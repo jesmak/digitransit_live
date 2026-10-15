@@ -2,7 +2,7 @@
 
 A feed sensor's state is the number of vehicles; the vehicles are in the
 `geojson` attribute, in the Map Feed format (docs/map-feed-format.md in
-ha-map-card-plugin-map-feed). A departure sensor's state is the time of the
+map-feed-card). A departure sensor's state is the time of the
 stop's next departure that isn't cancelled; the departures are in the
 `departures` attribute and the stop's service alerts in `notices`, in the
 departures format (docs/departures-format.md in departures-card).
@@ -64,7 +64,16 @@ class MapFeedSensor(CoordinatorEntity[VehicleFeedCoordinator], SensorEntity):
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        attributes: dict[str, Any] = {"map_feed_version": MAP_FEED_VERSION}
+        texts = self.coordinator.config_entry.runtime_data.texts
+        attributes: dict[str, Any] = {
+            "map_feed_version": MAP_FEED_VERSION,
+            "feed_type": "transit",
+            "list": {
+                "sort": [{"key": "line", "label": texts("sort_line"), "property": "badge"}],
+                "default": "line",
+                "count": texts("vehicles_count"),
+            },
+        }
         if area := self.coordinator.area:
             attributes["area"] = area.as_attribute()
         if data := self.coordinator.data:

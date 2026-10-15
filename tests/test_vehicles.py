@@ -80,11 +80,11 @@ def test_features_follow_the_map_feed_format() -> None:
     assert feature["id"] == "vehicle:Lappeenranta/90220"
     assert feature["geometry"]["coordinates"] == [28.17423, 61.04792]
     props = feature["properties"]
-    assert props["name"] == "Linja 4"
+    assert props["name"] == "Linja 4 → Mäntylä"
     assert props["kind"] == "bus"
     assert props["badge"] == "4"
     assert props["label"] == "→ Mäntylä"
-    assert props["subtitle"] == "→ Mäntylä"
+    assert "subtitle" not in props, "where it is going is in the name"
     assert props["heading"] == 235
     assert props["stationary"] is False
     assert props["speed_kmh"] == 23.8

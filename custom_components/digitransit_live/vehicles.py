@@ -187,6 +187,13 @@ def build_vehicle_features(reports: list[VehicleReport], config: VehicleFeedConf
             continue
 
         destination = f"→ {report.headsign}" if report.headsign else None
+        # The line and where it is going, as one title: "Linja 4 → Mäntylä".
+        if report.line and report.headsign:
+            name = texts("line_to", line=report.line, headsign=report.headsign)
+        elif report.line:
+            name = texts("line", line=report.line)
+        else:
+            name = report.vehicle_id
         details = []
         if report.start_time:
             details.append(row(texts("departure"), report.start_time))
@@ -198,7 +205,7 @@ def build_vehicle_features(reports: list[VehicleReport], config: VehicleFeedConf
                 report.latitude,
                 report.longitude,
                 {
-                    "name": texts("line", line=report.line) if report.line else report.vehicle_id,
+                    "name": name,
                     "kind": MODE_KINDS.get(report.mode, "other"),
                     "updated": iso_from_epoch_ms(report.timestamp * 1000) if report.timestamp else None,
                     "heading": round(report.bearing) if report.bearing is not None else None,
@@ -206,7 +213,6 @@ def build_vehicle_features(reports: list[VehicleReport], config: VehicleFeedConf
                     "speed_kmh": round(report.speed_mps * 3.6, 1) if report.speed_mps is not None else None,
                     "badge": report.line,
                     "label": destination,
-                    "subtitle": destination,
                     "color": report.color,
                     "details": details,
                 },

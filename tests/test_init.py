@@ -84,6 +84,8 @@ async def test_feeds_share_one_connection_and_write_map_feeds(hass: HomeAssistan
     assert line_4.state == "2"
     assert line_4.attributes["map_feed_version"] == 1
     assert line_4.attributes["attribution"] == "Digitransit, CC BY 4.0"
+    assert line_4.attributes["feed_type"] == "transit"
+    assert line_4.attributes["list"]["sort"] == [{"key": "line", "label": "Linja", "property": "badge"}]
     assert [feature["id"] for feature in line_4.attributes["geojson"]["features"]] == [
         "vehicle:Lappeenranta/1",
         "vehicle:Lappeenranta/3",

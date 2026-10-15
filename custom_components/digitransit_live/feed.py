@@ -1,6 +1,6 @@
 """Building blocks of the Map Feed format.
 
-The format is documented in docs/map-feed-format.md of ha-map-card-plugin-map-feed.
+The format is documented in docs/map-feed-format.md of map-feed-card.
 """
 
 from __future__ import annotations
