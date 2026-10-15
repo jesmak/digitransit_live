@@ -1,10 +1,7 @@
 {
     "resources": [
         "../../hass-kortit/departures-card/dist/departures-card.js",
-        "https://github.com/nathan-gs/ha-map-card/releases/download/v1.16.0/map-card.js"
-    ],
-    "files": [
-        "../../hass-kortit/ha-map-card-plugin-map-feed/dist/ha-map-card-plugin-map-feed.js"
+        "../../hass-kortit/map-feed-card/dist/map-feed-card.js"
     ],
     "clock": "2026-10-14T07:40:00+03:00",
     "states": {
@@ -29,16 +26,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 1",
+                                "name": "Line 1 → Hervanta",
                                 "kind": "tram",
                                 "updated": "2026-10-14T07:39:52+03:00",
                                 "heading": 95,
                                 "stationary": false,
                                 "speed_kmh": 28.4,
                                 "badge": "1",
-                                "label": "Hervanta",
-                                "subtitle": "Hervanta",
-                                "color": "#da2128"
+                                "label": "→ Hervanta",
+                                "color": "#da2128",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:24"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90201"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -52,16 +58,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 1",
+                                "name": "Line 1 → Pyynikintori",
                                 "kind": "tram",
                                 "updated": "2026-10-14T07:39:50+03:00",
                                 "heading": 265,
                                 "stationary": false,
                                 "speed_kmh": 24.1,
                                 "badge": "1",
-                                "label": "Pyynikintori",
-                                "subtitle": "Pyynikintori",
-                                "color": "#da2128"
+                                "label": "→ Pyynikintori",
+                                "color": "#da2128",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:31"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90208"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -75,16 +90,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 3",
+                                "name": "Line 3 → Hervanta",
                                 "kind": "tram",
                                 "updated": "2026-10-14T07:39:55+03:00",
                                 "heading": 95,
                                 "stationary": false,
                                 "speed_kmh": 31.0,
                                 "badge": "3",
-                                "label": "Hervanta",
-                                "subtitle": "Hervanta",
-                                "color": "#da2128"
+                                "label": "→ Hervanta",
+                                "color": "#da2128",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:27"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90215"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -98,16 +122,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 3",
+                                "name": "Line 3 → Lentävänniemi",
                                 "kind": "tram",
                                 "updated": "2026-10-14T07:39:48+03:00",
                                 "heading": 275,
                                 "stationary": true,
                                 "speed_kmh": 0.0,
                                 "badge": "3",
-                                "label": "Lentävänniemi",
-                                "subtitle": "Lentävänniemi",
-                                "color": "#da2128"
+                                "label": "→ Lentävänniemi",
+                                "color": "#da2128",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:35"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90222"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -121,16 +154,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 8",
+                                "name": "Line 8 → Atala",
                                 "kind": "bus",
                                 "updated": "2026-10-14T07:39:51+03:00",
                                 "heading": 60,
                                 "stationary": false,
                                 "speed_kmh": 36.2,
                                 "badge": "8",
-                                "label": "Atala",
-                                "subtitle": "Atala",
-                                "color": "#1b57a7"
+                                "label": "→ Atala",
+                                "color": "#1b57a7",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:30"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90229"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -144,16 +186,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 8",
+                                "name": "Line 8 → Linnainmaa",
                                 "kind": "bus",
                                 "updated": "2026-10-14T07:39:53+03:00",
                                 "heading": 200,
                                 "stationary": false,
                                 "speed_kmh": 22.5,
                                 "badge": "8",
-                                "label": "Linnainmaa",
-                                "subtitle": "Linnainmaa",
-                                "color": "#1b57a7"
+                                "label": "→ Linnainmaa",
+                                "color": "#1b57a7",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:33"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90236"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -167,16 +218,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 25",
+                                "name": "Line 25 → Kaukajärvi",
                                 "kind": "bus",
                                 "updated": "2026-10-14T07:39:49+03:00",
                                 "heading": 140,
                                 "stationary": false,
                                 "speed_kmh": 41.0,
                                 "badge": "25",
-                                "label": "Kaukajärvi",
-                                "subtitle": "Kaukajärvi",
-                                "color": "#1b57a7"
+                                "label": "→ Kaukajärvi",
+                                "color": "#1b57a7",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:21"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90243"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -190,16 +250,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 2",
+                                "name": "Line 2 → Rahola",
                                 "kind": "bus",
                                 "updated": "2026-10-14T07:39:54+03:00",
                                 "heading": 330,
                                 "stationary": false,
                                 "speed_kmh": 18.9,
                                 "badge": "2",
-                                "label": "Rahola",
-                                "subtitle": "Rahola",
-                                "color": "#1b57a7"
+                                "label": "→ Rahola",
+                                "color": "#1b57a7",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:36"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90250"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -213,16 +282,25 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 13",
+                                "name": "Line 13 → Hervanta",
                                 "kind": "bus",
                                 "updated": "2026-10-14T07:39:47+03:00",
                                 "heading": 85,
                                 "stationary": true,
                                 "speed_kmh": 0.0,
                                 "badge": "13",
-                                "label": "Hervanta",
-                                "subtitle": "Hervanta",
-                                "color": "#1b57a7"
+                                "label": "→ Hervanta",
+                                "color": "#1b57a7",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:38"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90257"
+                                    }
+                                ]
                             }
                         },
                         {
@@ -236,19 +314,40 @@
                                 ]
                             },
                             "properties": {
-                                "name": "Line 17",
+                                "name": "Line 17 → Pirkkala",
                                 "kind": "bus",
                                 "updated": "2026-10-14T07:39:56+03:00",
                                 "heading": 250,
                                 "stationary": false,
                                 "speed_kmh": 33.7,
                                 "badge": "17",
-                                "label": "Pirkkala",
-                                "subtitle": "Pirkkala",
-                                "color": "#1b57a7"
+                                "label": "→ Pirkkala",
+                                "color": "#1b57a7",
+                                "details": [
+                                    {
+                                        "label": "Departure",
+                                        "value": "07:28"
+                                    },
+                                    {
+                                        "label": "Vehicle",
+                                        "value": "90264"
+                                    }
+                                ]
                             }
                         }
                     ]
+                },
+                "feed_type": "transit",
+                "list": {
+                    "sort": [
+                        {
+                            "key": "line",
+                            "label": "Line",
+                            "property": "badge"
+                        }
+                    ],
+                    "default": "line",
+                    "count": "vehicles"
                 }
             }
         },
@@ -378,27 +477,12 @@
                         "column_span": 2,
                         "cards": [
                             {
-                                "type": "custom:map-card",
-                                "x": 61.4985,
-                                "y": 23.765,
-                                "zoom": 14,
-                                "map_options": {
-                                    "zoomControl": false
-                                },
-                                "plugins": [
-                                    {
-                                        "name": "Buses and trams",
-                                        "url": "/local/ha-map-card-plugin-map-feed.js",
-                                        "options": {
-                                            "entity": "sensor.tampere_buses_and_trams",
-                                            "labels": 14
-                                        }
-                                    }
-                                ],
-                                "grid_options": {
-                                    "columns": "full",
-                                    "rows": 9
-                                }
+                                "type": "custom:map-feed-card",
+                                "map_height": 510,
+                                "list": true,
+                                "entities": [
+                                    "sensor.tampere_buses_and_trams"
+                                ]
                             }
                         ]
                     },
@@ -419,7 +503,8 @@
                         ]
                     }
                 ]
-            }
+            },
+            "popup": "2"
         },
         {
             "name": "stop-departures",

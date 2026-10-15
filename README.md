@@ -4,8 +4,8 @@ Home Assistant integration that turns Digitransit's live buses, trams and stop d
 
 [![GitHub Release][releases-shield]][releases] [![GitHub Release Date][release-date-shield]][releases] [![HACS][hacs-shield]][hacs] [![License][license-shield]](LICENSE)
 
-<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-light.png#gh-light-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams labelled with their lines and destinations, and the departures from two stops, one of them with a notice about the stop moving">
-<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-dark.png#gh-dark-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams labelled with their lines and destinations, and the departures from two stops, one of them with a notice about the stop moving">
+<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-light.png#gh-light-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams showing their lines, the list of them beside it with one bus's details open, and the departures from two stops, one of them with a notice about the stop moving">
+<img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-dark.png#gh-dark-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams showing their lines, the list of them beside it with one bus's details open, and the departures from two stops, one of them with a notice about the stop moving">
 
 ## What is it?
 
