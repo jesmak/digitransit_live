@@ -1,7 +1,7 @@
 {
     "resources": [
-        "../../hass-kortit/departures-card/dist/departures-card.js",
-        "../../hass-kortit/map-feed-card/dist/map-feed-card.js"
+        "../../hass-cards/departures-card/dist/departures-card.js",
+        "../../hass-cards/map-feed-card/dist/map-feed-card.js"
     ],
     "clock": "2026-10-14T07:40:00+03:00",
     "states": {
