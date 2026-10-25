@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import time
+from types import MappingProxyType
 
-from homeassistant.config_entries import ConfigEntryState, ConfigSubentryData
+import pytest
+from homeassistant.config_entries import ConfigEntryState, ConfigSubentry, ConfigSubentryData
 from homeassistant.const import MATCH_ALL, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -86,6 +88,7 @@ async def test_feeds_share_one_connection_and_write_map_feeds(hass: HomeAssistan
     assert line_4.attributes["attribution"] == "Digitransit, CC BY 4.0"
     assert line_4.attributes["feed_type"] == "transit"
     assert line_4.attributes["list"]["sort"] == [{"key": "line", "label": "Linja", "property": "badge"}]
+    assert (line_4.attributes["list"]["count"], line_4.attributes["list"]["count_one"]) == ("ajoneuvoa", "ajoneuvo")
     assert [feature["id"] for feature in line_4.attributes["geojson"]["features"]] == [
         "vehicle:Lappeenranta/1",
         "vehicle:Lappeenranta/3",
@@ -103,6 +106,44 @@ async def test_feeds_share_one_connection_and_write_map_feeds(hass: HomeAssistan
     assert await hass.config_entries.async_unload(entry.entry_id)
     assert entry.state is ConfigEntryState.NOT_LOADED
     assert client.stopped
+
+
+@pytest.mark.parametrize("change", ["data", "subentry"])
+async def test_a_change_saved_while_setting_up_is_applied(
+    hass: HomeAssistant, fake_mqtt: type[FakeMqtt], monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
+    entry = MockConfigEntry(domain=DOMAIN, title="Digitransit", data={"language": "en"})
+    entry.add_to_hass(hass)
+    vehicles = ConfigSubentry(
+        data=MappingProxyType({"feed": "Lappeenranta", "lines": ["4"], "use_area": False, "max_age_minutes": 2, "update_seconds": 15}),
+        subentry_type="vehicles",
+        title="Linja 4",
+        unique_id=None,
+    )
+    forward = hass.config_entries.async_forward_entry_setups
+    setups = []
+
+    async def save_while_setting_up(entry: MockConfigEntry, platforms) -> None:
+        # Saved as a flow would save it, before setup has added its update listener.
+        if not setups:
+            if change == "data":
+                hass.config_entries.async_update_entry(entry, data={"language": "fi"})
+            else:
+                hass.config_entries.async_add_subentry(entry, vehicles)
+        setups.append(entry.runtime_data)
+        await forward(entry, platforms)
+
+    monkeypatch.setattr(hass.config_entries, "async_forward_entry_setups", save_while_setting_up)
+    # Not asserted: the reload may already be under way when the setup returns.
+    await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entry.state is ConfigEntryState.LOADED
+    assert len(setups) == 2, "set up again with the change"
+    if change == "data":
+        assert entry.runtime_data.texts.language == "fi"
+    else:
+        assert vehicles.subentry_id in entry.runtime_data.coordinators
 
 
 async def test_an_entry_left_on_swedish_is_switched_to_english(hass: HomeAssistant) -> None:

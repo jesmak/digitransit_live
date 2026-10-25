@@ -142,7 +142,7 @@
           },
           "data_description": {
             "stop": "Pysäkit ovat usein pareittain kadun eri puolilla.",
-            "departures": "Sensorin tila on seuraava lähtö, muut ovat sen attribuuteissa.",
+            "departures": "Kuinka monta seuraavaa lähtöä sensori listaa.",
             "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
             "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein.",
             "alerts": "Linjan tiedote voi koskea mitä tahansa linjan pysäkkiä. Liikennemuutoksia ovat poikkeusreitit, peruttu tai harvennettu liikenne ja viivästykset."
@@ -158,7 +158,7 @@
             "alerts": "Häiriötiedotteet"
           },
           "data_description": {
-            "departures": "Sensorin tila on seuraava lähtö, muut ovat sen attribuuteissa.",
+            "departures": "Kuinka monta seuraavaa lähtöä sensori listaa.",
             "lines": "Linjanumerot, kuten 4 tai 8A. Jätä tyhjäksi, niin mukana ovat kaikki linjat.",
             "update_seconds": "Kuinka usein lähdöt haetaan, vähintään 30 sekunnin välein.",
             "alerts": "Linjan tiedote voi koskea mitä tahansa linjan pysäkkiä. Liikennemuutoksia ovat poikkeusreitit, peruttu tai harvennettu liikenne ja viivästykset."

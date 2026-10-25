@@ -6,6 +6,7 @@
   "line_to": "Linja {line} → {headsign}",
   "sort_line": "Linja",
   "vehicles_count": "ajoneuvoa",
+  "vehicles_count_one": "ajoneuvo",
   "region_digitraffic": "Suomen junat",
   "region_HSL": "Helsingin seutu (HSL)",
   "region_MATKA": "matka.fi-bussit",

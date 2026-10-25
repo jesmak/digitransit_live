@@ -200,7 +200,7 @@ class VehicleFeedFlow(ConfigSubentryFlow):
                 data = clean(data)
                 if current is None:
                     return self.async_create_entry(title=title, data=data)
-                return self.async_update_and_abort(self._get_entry(), current, title=title, data=data)
+                return self.async_update_and_abort(self._get_entry(), current, title=title, data=data, reason="reconfigure_successful")
 
         if user_input is not None:
             values = user_input
@@ -424,7 +424,9 @@ class DeparturesFlow(ConfigSubentryFlow):
     async def async_step_reconfigure(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
         subentry = self._get_reconfigure_subentry()
         if user_input is not None:
-            return self.async_update_and_abort(self._get_entry(), subentry, data={**subentry.data, **departure_settings(user_input)})
+            return self.async_update_and_abort(
+                self._get_entry(), subentry, data={**subentry.data, **departure_settings(user_input)}, reason="reconfigure_successful"
+            )
         return self.async_show_form(
             step_id="reconfigure",
             data_schema=self.add_suggested_values_to_schema(vol.Schema(departure_fields()), {**DEPARTURE_DEFAULTS, **subentry.data}),

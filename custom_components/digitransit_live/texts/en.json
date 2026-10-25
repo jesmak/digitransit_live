@@ -6,6 +6,7 @@
   "line_to": "Line {line} → {headsign}",
   "sort_line": "Line",
   "vehicles_count": "vehicles",
+  "vehicles_count_one": "vehicle",
   "region_digitraffic": "Finland trains",
   "region_HSL": "Helsinki region (HSL)",
   "region_MATKA": "matka.fi buses",

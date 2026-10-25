@@ -99,6 +99,7 @@ async def test_reconfiguring_a_feed(hass: HomeAssistant, fake_mqtt: type[FakeMqt
     result = await hass.config_entries.subentries.async_configure(result["flow_id"], FEED | {"feed": "tampere", "use_area": True})
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
+    assert result.get("translation_domain") is None, "the integration's own text"
     await hass.async_block_till_done()
 
     assert entry.subentries[subentry_id].data["feed"] == "tampere"
@@ -129,6 +130,7 @@ async def test_an_unchanged_key_is_not_checked_again(hass: HomeAssistant, aiocli
     result = await entry.start_reconfigure_flow(hass)
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"language": "en", "api_key": "old"})
     assert result["reason"] == "reconfigure_successful"
+    assert result.get("translation_domain") is None, "the integration's own text"
     assert aioclient_mock.call_count == 0, "the language changes while Digitransit is down"
 
 
@@ -137,6 +139,7 @@ async def test_the_api_key_can_be_removed(hass: HomeAssistant) -> None:
     result = await entry.start_reconfigure_flow(hass)
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {"language": "en"})
     assert result["reason"] == "reconfigure_successful"
+    assert result.get("translation_domain") is None, "the integration's own text"
     await hass.async_block_till_done()
     assert entry.data == {"language": "en"}
 
@@ -235,6 +238,7 @@ async def test_adding_stop_departures(hass: HomeAssistant, routing_api: AiohttpC
         result["flow_id"], {"departures": 1.0, "update_seconds": 120.0, "alerts": "off"}
     )
     assert result["reason"] == "reconfigure_successful"
+    assert result.get("translation_domain") is None, "the integration's own text"
     await hass.async_block_till_done()
     assert entry.subentries[subentry.subentry_id].data == {
         "router": "finland",

@@ -72,6 +72,7 @@ class MapFeedSensor(CoordinatorEntity[VehicleFeedCoordinator], SensorEntity):
                 "sort": [{"key": "line", "label": texts("sort_line"), "property": "badge"}],
                 "default": "line",
                 "count": texts("vehicles_count"),
+                "count_one": texts("vehicles_count_one"),
             },
         }
         if area := self.coordinator.area:
