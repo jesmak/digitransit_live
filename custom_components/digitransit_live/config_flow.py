@@ -352,7 +352,7 @@ class DeparturesFlow(ConfigSubentryFlow):
             except DigitransitError:
                 errors["base"] = "cannot_connect"
             else:
-                if (centre := region_centre(stops)) is not None:
+                if (centre := await self.hass.async_add_executor_job(region_centre, stops)) is not None:
                     self._region = region
                     self._region_stops = stops
                     self._location = {"latitude": centre[0], "longitude": centre[1]}
@@ -390,7 +390,9 @@ class DeparturesFlow(ConfigSubentryFlow):
         """The stops nearest the pin, and what the sensor shows. The last choice goes back to the map."""
         if self._region_stops is None or self._location is None:
             return await self.async_step_user()
-        stops = nearest_stops(self._region_stops, self._location["latitude"], self._location["longitude"], STOP_CHOICES)
+        stops = await self.hass.async_add_executor_job(
+            nearest_stops, self._region_stops, self._location["latitude"], self._location["longitude"], STOP_CHOICES
+        )
         listed = {str(stop["gtfsId"]): stop for stop in stops}
 
         if user_input is not None:
