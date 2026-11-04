@@ -28,7 +28,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: DigitransitConfigEntry
     if entry.version > 1:
         return False
     if entry.minor_version < 2:
-        # Swedish was dropped in 1.2. An entry still set to it is switched to English, which it already wrote mostly.
+        # An entry set to a language the integration no longer has would have no texts, so it falls back to English.
         data = dict(entry.data)
         if data.get(CONF_LANGUAGE) not in LANGUAGES:
             data[CONF_LANGUAGE] = "en"

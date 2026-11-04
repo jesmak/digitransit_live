@@ -112,7 +112,7 @@ class RoutingClient:
                 headers={API_KEY_HEADER: self._api_key},
                 timeout=TIMEOUT,
             ) as response:
-                # 401 is a missing or wrong key. 403 means the quota ran out, which isn't the key's fault.
+                # A missing or wrong key gets 401.
                 if response.status == 401:
                     raise DigitransitAuthError("Digitransit refused the subscription key")
                 if response.status != 200:

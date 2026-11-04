@@ -47,7 +47,7 @@ estimates from Digitransit's routing API. They need a free Digitransit API key; 
 | Name     | Type     | Description                                                   | Default                                                   |
 | -------- | -------- | ------------------------------------------------------------- | --------------------------------------------------------- |
 | language | enum     | Language of the texts written into feeds, `fi` or `en`        | Home Assistant's language if it is one of them, else `en` |
-| API key  | password | Digitransit subscription key, needed only for stop departures | none                                                      |
+| API key  | password | Digitransit subscription key, needed only for stop departures |                                                           |
 
 Get an API key by registering at [portal-api.digitransit.fi](https://portal-api.digitransit.fi/) and subscribing to
 the routing API. The key is checked when you save it.
@@ -56,15 +56,15 @@ the routing API. The key is checked when you save it.
 
 Add with **Add vehicle feed** on the integration page. Every feed creates one sensor named after the feed.
 
-| Name                 | Type    | Description                                                                    | Default     |
-| -------------------- | ------- | ------------------------------------------------------------------------------ | ----------- |
-| Name                 | string  | Name of the feed and its sensor                                                |             |
-| Region               | enum    | The region's feed id on Digitransit, e.g. `Lappeenranta` or `tampere`          |             |
-| Lines                | list    | Line numbers such as `4` or `8A`. Empty for every line                         | every line  |
-| Limit to an area     | boolean | Only vehicles inside the area                                                  | off         |
-| Area                 | circle  | Centre and radius, picked on a map                                             | home, 10 km |
-| Maximum position age | minutes | Vehicles that haven't reported for longer are left out                         | 2           |
-| Update interval      | seconds | How often the sensor is updated, at least 5. Vehicles report about once a second | 15          |
+| Name                 | Type    | Description                                                                       | Default     |
+| -------------------- | ------- | --------------------------------------------------------------------------------- | ----------- |
+| Name                 | string  | Name of the feed and its sensor                                                   | required    |
+| Region               | enum    | The region's feed id on Digitransit, e.g. `Lappeenranta` or `tampere`             | required    |
+| Lines                | list    | Line numbers such as `4` or `8A`. Empty for every line                            | every line  |
+| Limit to an area     | boolean | Only vehicles inside the area                                                     | off         |
+| Area                 | circle  | Centre and radius, picked on a map                                                | home, 10 km |
+| Maximum position age | minutes | Vehicles that haven't reported for longer are left out                            | 2           |
+| Update interval      | seconds | How often the sensor is updated, at least 15. Vehicles report about once a second | 15          |
 
 Large regions have hundreds of vehicles. Limit big feeds with lines or an area, so the sensor stays small.
 
@@ -99,8 +99,6 @@ stop moves included. The choices:
 | The stop's own                                  | The stop's own alerts                                                                                       |
 | The stop's own and service changes on its lines | Also line alerts that change the trip: detours, no or reduced service, modified service, significant delays |
 | The stop's own and every alert on its lines     | Also every other line alert, such as a stop moved elsewhere on the line                                     |
-
-Stops added before 1.1.0 use the default until changed.
 
 ## Sensors
 
@@ -148,25 +146,25 @@ follow the [departures format](https://github.com/jesmak/departures-card/blob/ma
 
 Each departure has:
 
-| Key         | Description                                                          |
-| ----------- | -------------------------------------------------------------------- |
-| `id`        | The trip and its service day, the same on every update               |
-| `line`      | Line number                                                          |
-| `mode`      | Vehicle type: `bus`, `tram`, `metro`, `train`, `ferry` or `other`    |
-| `headsign`  | Destination                                                          |
-| `scheduled` | Departure time in the timetable                                      |
-| `estimated` | Real-time estimate, or the timetable time when there is none         |
-| `realtime`  | Whether `estimated` comes from a tracked vehicle                     |
-| `delay`     | Seconds late; negative when early                                    |
-| `platform`  | Platform or track, when the stop has one                             |
-| `cancelled` | `true` when the trip is cancelled                                    |
-| `notice`    | The line's service alerts in force now, joined with ` · `            |
-| `color`     | The line's own colour, when the region gives one                     |
+| Key         | Description                                                                          |
+| ----------- | ------------------------------------------------------------------------------------ |
+| `id`        | The trip, its service day and the stop's place on the trip, the same on every update |
+| `line`      | Line number                                                                          |
+| `mode`      | Vehicle type: `bus`, `tram`, `metro`, `train`, `ferry` or `other`                    |
+| `headsign`  | Destination                                                                          |
+| `scheduled` | Departure time in the timetable                                                      |
+| `estimated` | Real-time estimate, or the timetable time when there is none                         |
+| `realtime`  | Whether `estimated` comes from a tracked vehicle                                     |
+| `delay`     | Seconds late, negative when early                                                    |
+| `platform`  | Platform or track, when the stop has one                                             |
+| `cancelled` | `true` when the trip is cancelled                                                    |
+| `notice`    | The line's service alerts in force now, joined with ` · `                            |
+| `color`     | The line's own colour, when the region gives one                                     |
 
 Alerts are shown in the integration's language when Digitransit has them in it, and otherwise in the region's own
 language, usually Finnish. Only an alert's headline is used, from its start to its end. Keys with no value are left out. Cancelled trips stay in the list, marked `cancelled`, so you know not to wait for them.
-Arrivals at a line's last stop are left out, since nobody can board them. Only the next departure time is stored in the
-recorder, not the list. If Digitransit refuses the API key, the sensors become unavailable and Home Assistant asks for
+Arrivals at a line's last stop are left out, since nobody can board them. The departures and notices aren't stored in
+the recorder. If Digitransit refuses the API key, the sensors become unavailable and Home Assistant asks for
 a new key on the integration page.
 
 ## Examples
@@ -207,6 +205,10 @@ update interval was set below 15 seconds is updated every 15 seconds. An integra
 
 The public transport data comes from [Digitransit](https://digitransit.fi/) and the regional transport authorities,
 licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+This is an unofficial integration, not affiliated with or endorsed by Digitransit or the regional transport
+authorities. Every user who wants stop departures signs up for a Digitransit API key of their own, and is bound by
+Digitransit's terms for it.
 
 ### How it is fetched
 

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import time
+from datetime import timedelta
 from types import MappingProxyType
 
 import pytest
+from freezegun.api import FrozenDateTimeFactory
 from homeassistant.config_entries import ConfigEntryState, ConfigSubentry, ConfigSubentryData
 from homeassistant.const import MATCH_ALL, STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
@@ -159,6 +161,27 @@ async def test_feeds_are_kept_out_of_the_recorder() -> None:
     assert MATCH_ALL in MapFeedSensor._unrecorded_attributes
 
 
+async def test_an_unchanged_feed_is_not_written_again(
+    hass: HomeAssistant, fake_mqtt: type[FakeMqtt], freezer: FrozenDateTimeFactory
+) -> None:
+    entry = feed_entry(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    [client] = fake_mqtt.instances
+
+    client.push(*vehicle_message(vehicle_id="1", line="4"))
+    await refresh_all(entry)
+    await hass.async_block_till_done()
+    written = {entity_id: hass.states.get(entity_id).last_updated for entity_id in ("sensor.linja_4", "sensor.tampere")}
+
+    # Later, so a written feed's updated attribute would differ.
+    freezer.tick(timedelta(seconds=20))
+    await refresh_all(entry)
+    await hass.async_block_till_done()
+    assert hass.states.get("sensor.linja_4").last_updated == written["sensor.linja_4"], "no new reports"
+    assert hass.states.get("sensor.tampere").last_updated == written["sensor.tampere"], "empty"
+
+
 async def test_old_vehicles_are_dropped_and_a_silent_disconnected_feed_is_unavailable(
     hass: HomeAssistant, fake_mqtt: type[FakeMqtt]
 ) -> None:
@@ -217,7 +240,7 @@ async def test_departures_sensor(hass: HomeAssistant, routing_api: AiohttpClient
 
 
 async def test_departures_are_kept_out_of_the_recorder() -> None:
-    assert "departures" in DeparturesSensor._unrecorded_attributes
+    assert {"departures", "notices"} <= DeparturesSensor._unrecorded_attributes
 
 
 async def test_a_refused_api_key_asks_for_a_new_one(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
@@ -227,5 +250,16 @@ async def test_a_refused_api_key_asks_for_a_new_one(hass: HomeAssistant, aioclie
     await hass.async_block_till_done()
 
     assert hass.states.get("sensor.kauppatori_h0453").state == STATE_UNAVAILABLE
+    [flow] = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
+    assert flow["context"]["source"] == "reauth"
+
+
+async def test_a_stop_without_an_api_key_asks_for_one(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
+    entry = departures_entry(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert hass.states.get("sensor.kauppatori_h0453").state == STATE_UNAVAILABLE
+    assert aioclient_mock.call_count == 0
     [flow] = hass.config_entries.flow.async_progress_by_handler(DOMAIN)
     assert flow["context"]["source"] == "reauth"
