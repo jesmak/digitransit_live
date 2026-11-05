@@ -2,7 +2,7 @@
 
 Home Assistant integration that turns Digitransit's live buses, trams and stop departures into map feeds and sensors.
 
-[![GitHub Release][releases-shield]][releases] [![GitHub Release Date][release-date-shield]][releases] [![Marketplace][marketplace-shield]][marketplace] [![License][license-shield]](LICENSE)
+[![GitHub Release][releases-shield]][releases] [![GitHub Release Date][release-date-shield]][releases] [![Downloads][downloads-shield]][releases] [![Marketplace][marketplace-shield]][marketplace] [![License][license-shield]](LICENSE)
 
 <img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-light.png#gh-light-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams showing their lines, the list of them beside it with one bus's details open, and the departures from two stops, one of them with a notice about the stop moving">
 <img src="https://raw.githubusercontent.com/jesmak/digitransit_live/main/docs/images/dashboard-dark.png#gh-dark-mode-only" width="1280" alt="A dashboard in Tampere, with a map of buses and trams showing their lines, the list of them beside it with one bus's details open, and the departures from two stops, one of them with a notice about the stop moving">
@@ -271,6 +271,7 @@ MIT, see [LICENSE](LICENSE).
 [releases-shield]: https://img.shields.io/github/release/jesmak/digitransit_live.svg?style=for-the-badge
 [release-date-shield]: https://img.shields.io/github/release-date/jesmak/digitransit_live?style=for-the-badge
 [releases]: https://github.com/jesmak/digitransit_live/releases
+[downloads-shield]: https://img.shields.io/github/downloads/jesmak/digitransit_live/total.svg?style=for-the-badge
 [marketplace-shield]: https://img.shields.io/badge/Marketplace-Default-green.svg?style=for-the-badge
 [marketplace]: https://my.home-assistant.io/redirect/marketplace_repository/?owner=jesmak&repository=digitransit_live&category=integration
 [license-shield]: https://img.shields.io/github/license/jesmak/digitransit_live.svg?style=for-the-badge

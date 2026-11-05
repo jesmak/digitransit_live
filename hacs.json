@@ -1,6 +1,8 @@
 {
   "name": "Digitransit Live",
   "render_readme": true,
+  "zip_release": true,
+  "filename": "digitransit_live.zip",
   "country": "FI",
   "homeassistant": "2026.10.0"
 }
