@@ -105,6 +105,14 @@ def test_modes_are_the_departures_formats() -> None:
     ]
 
 
+def test_a_route_without_a_short_name_has_an_empty_line() -> None:
+    departure = stoptime("", "Lake Town", NOON + 60)
+    departure["trip"]["route"] = {"shortName": None, "longName": "Lake Town - Ridge - Market Square", "mode": "BUS"}
+    stop = {"gtfsId": "MATKA:1", "name": "X", "stoptimesWithoutPatterns": [departure]}
+
+    assert [departure.line for departure in parse_departures(stop, config(), "fi", NOW).departures] == [""]
+
+
 def test_lines_filter_departures_and_fetch_more() -> None:
     only_16 = config(lines=[" 16 "])
     assert only_16.fetch_count == 20

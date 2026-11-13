@@ -178,7 +178,9 @@ def parse_departure(stoptime: Mapping[str, Any]) -> Departure | None:
     return Departure(
         # A trip that passes the stop twice, as a loop line can, departs from it at two positions.
         id=f"trip:{trip['gtfsId']}/{service_day}/{position}" if is_int(position) else f"trip:{trip['gtfsId']}/{service_day}",
-        line=str(route.get("shortName") or route.get("longName") or ""),
+        # A route's long name describes the whole route and is usually too long for a badge, so a route without a short name
+        # gets an empty line, which the card shows as the mode's icon.
+        line=str(route.get("shortName") or ""),
         headsign=stoptime.get("headsign") or trip.get("tripHeadsign"),
         mode=MODES.get(str(route.get("mode")), "other"),
         scheduled=dt_util.utc_from_timestamp(service_day + scheduled),

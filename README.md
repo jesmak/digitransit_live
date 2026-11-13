@@ -149,7 +149,7 @@ Each departure has:
 | Key         | Description                                                                          |
 | ----------- | ------------------------------------------------------------------------------------ |
 | `id`        | The trip, its service day and the stop's place on the trip, the same on every update |
-| `line`      | Line number                                                                          |
+| `line`      | Line number, or empty when the route has none                                        |
 | `mode`      | Vehicle type: `bus`, `tram`, `metro`, `train`, `ferry` or `other`                    |
 | `headsign`  | Destination                                                                          |
 | `scheduled` | Departure time in the timetable                                                      |
