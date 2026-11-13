@@ -35,7 +35,9 @@ query RegionStops($feeds: [String!]) {
 """
 
 # The stop's own service alerts and each departure's line alerts come with the departures, in every language they have;
-# which ones are shown is decided locally.
+# which ones are shown is decided locally. The API looks only a day ahead and leaves cancelled trips out unless told
+# otherwise, so the departures are asked from the week ahead, as a rural stop may have only a few a day or none on a
+# weekend, and with the cancelled ones, which stay in the list.
 STOP_DEPARTURES = """
 fragment AlertFields on Alert {
   alertHeaderText
@@ -56,7 +58,7 @@ query StopDepartures($id: String!, $count: Int!) {
     alerts(types: [STOP]) {
       ...AlertFields
     }
-    stoptimesWithoutPatterns(numberOfDepartures: $count, omitNonPickups: true) {
+    stoptimesWithoutPatterns(numberOfDepartures: $count, timeRange: 604800, omitNonPickups: true, omitCanceled: false) {
       scheduledDeparture
       realtimeDeparture
       departureDelay
